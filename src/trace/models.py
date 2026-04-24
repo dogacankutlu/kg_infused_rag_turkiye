@@ -154,11 +154,17 @@ class RAGResult:
     error: str = ""
 
     def verdict(self) -> str:
+        # 1. hard failure — pipeline crashed
         if self.error:
             return "failure"
-        if self.metrics and (self.metrics.em >= 1.0 or self.metrics.f1 >= 0.5):
-            return "success"
-        return "failure"
+        # 2. we have a gold answer → judge by metrics
+        if self.question.gold_answer:
+            if self.metrics and (self.metrics.em >= 1.0 or self.metrics.f1 >= 0.5):
+                return "success"
+            return "failure"
+        # 3. no gold answer → any non-empty answer counts as success,
+        #    empty answer counts as failure
+        return "success" if (self.answer or "").strip() else "failure"
 
     def to_dict(self) -> dict[str, Any]:
         return {
