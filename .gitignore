@@ -1,0 +1,55 @@
+# ── Credentials ────────────────────────────────────────────────
+# NEVER commit .env — it contains your Groq API key
+.env
+
+# ── Python runtime ──────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.cover
+*.log
+
+# ── Wikidata5M raw data (total ~7.5 GB — too large for git) ─────
+data/raw/wikidata5m_raw_data/
+data/raw/wikidata5m_kg.jsonl
+
+# ── Filtered processed files (too large for git) ────────────────
+# stats.json is small and useful → tracked
+data/processed/turkiye_entities.jsonl
+data/processed/turkiye_triples.tsv
+data/processed/turkiye_text.tsv
+data/processed/turkiye_aliases.tsv
+
+# ── Run logs (regenerated on each eval run) ─────────────────────
+logs/success/*.jsonl
+logs/failure/*.jsonl
+logs/*.csv
+logs/*.json
+
+# ── Node / frontend ─────────────────────────────────────────────
+web/node_modules/
+web/dist/
+web/.vite/
+
+# ── macOS metadata ───────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── IDE ──────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo

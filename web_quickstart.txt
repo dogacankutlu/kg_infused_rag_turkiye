@@ -1,0 +1,145 @@
+═══════════════════════════════════════════════════════════════════
+  KG-INFUSED RAG — TÜRKIYE DOMAIN  |  WEB UI QUICKSTART
+═══════════════════════════════════════════════════════════════════
+
+  Web UI = FastAPI backend (reuses the same pipeline as the CLI) +
+  React/Vite frontend. Two terminals. Neo4j must be running.
+
+───────────────────────────────────────────────────────────────────
+  ONE-TIME SETUP
+───────────────────────────────────────────────────────────────────
+
+  1. Install the new Python web deps (fastapi + uvicorn):
+
+       cd "/Users/hardokut/Desktop/Social Networks Term Project/kg_infused_rag_turkiye"
+       source .venv/bin/activate
+       pip install -r requirements.txt
+
+  2. Install the frontend deps (needs Node.js 18+):
+
+       cd web
+       npm install
+       cd ..
+
+  That's it. From now on, starting the web UI is two commands.
+
+
+───────────────────────────────────────────────────────────────────
+  EVERY-TIME STARTUP  (3 terminals if you want live reload)
+───────────────────────────────────────────────────────────────────
+
+  Terminal 0 — Neo4j
+     Open Neo4j Desktop. Click START on the turkiye-kg database.
+     Wait for the green "Running" light.
+
+  Terminal 1 — Backend (FastAPI on http://127.0.0.1:8000)
+
+       cd "/Users/hardokut/Desktop/Social Networks Term Project/kg_infused_rag_turkiye"
+       source .venv/bin/activate
+       python -m src.cli serve --reload
+
+     Expected output:
+       Uvicorn running on http://127.0.0.1:8000
+
+     Sanity check (in a 2nd terminal):
+       curl http://127.0.0.1:8000/api/health
+       → {"status":"ok"}
+
+  Terminal 2 — Frontend (Vite dev server on http://localhost:5173)
+
+       cd "/Users/hardokut/Desktop/Social Networks Term Project/kg_infused_rag_turkiye/web"
+       npm run dev
+
+     Expected output:
+       VITE ready in ... ms
+       Local:   http://localhost:5173/
+
+  Open http://localhost:5173/ in your browser. The Vite dev server
+  proxies /api → 127.0.0.1:8000 automatically, so no CORS hassle.
+
+
+───────────────────────────────────────────────────────────────────
+  WHAT YOU CAN DO IN THE UI
+───────────────────────────────────────────────────────────────────
+
+  Home (/)
+    • Type a Türkiye question and hit Ask.
+    • See seed cards (id, name, score, one-hop relations).
+    • Interactive spreading-activation graph (Cytoscape): nodes
+      colored by round, edges labeled with relation.
+    • Entity + triple distribution per round (Recharts bar chart).
+    • KG summary paragraph.
+    • Retrieval hits (original / expanded / deduped).
+    • Passage note → enhanced note → final answer with EM/F1/RR.
+
+  History (/history)  — sidebar tabs:
+    • Statistics Summary — totals, domain pie, difficulty bars.
+    • Top Relations     — bar chart + full table.
+    • Sample Triplets   — searchable list from stats.json.
+    • QA Dataset        — filter by domain + difficulty.
+    • Cypher Catalog    — the Cypher templates the pipeline uses.
+    • Recent Runs       — pulled from logs/success + logs/failure.
+
+
+───────────────────────────────────────────────────────────────────
+  API ENDPOINTS  (for direct calls or custom tooling)
+───────────────────────────────────────────────────────────────────
+
+  GET  /api/health            ping
+  POST /api/ask               {question_text, gold_answer?, domain?, difficulty?}
+  GET  /api/stats             filtered + live + QA histograms
+  GET  /api/domains           distinct QA domains
+  GET  /api/questions         ?domain=&difficulty=
+  GET  /api/history           ?verdict=success|failure&limit=N
+  GET  /api/queries           Cypher query catalog + stats
+
+  Example:
+    curl -X POST http://127.0.0.1:8000/api/ask \
+         -H "Content-Type: application/json" \
+         -d '{"question_text":"Galatasarayın teknik direktörünün doğum yeri neresidir?","gold_answer":"İstanbul"}'
+
+
+───────────────────────────────────────────────────────────────────
+  BUILDING FOR PRODUCTION  (optional)
+───────────────────────────────────────────────────────────────────
+
+       cd web
+       npm run build
+       # outputs web/dist — serve with any static host, and point
+       # it at the FastAPI origin (http://127.0.0.1:8000).
+
+
+───────────────────────────────────────────────────────────────────
+  SHUTTING DOWN
+───────────────────────────────────────────────────────────────────
+
+  • Ctrl+C in the Vite terminal  → frontend off
+  • Ctrl+C in the uvicorn terminal → backend off
+  • Leave Neo4j running or STOP it from Neo4j Desktop
+
+
+───────────────────────────────────────────────────────────────────
+  TROUBLESHOOTING
+───────────────────────────────────────────────────────────────────
+
+  Frontend loads but every API call fails
+    → Backend not running. Start Terminal 1 (uvicorn).
+
+  Backend starts but /api/ask hangs
+    → First call warms up embeddings + Neo4j driver (~10–30s). Wait.
+    → Subsequent calls are fast.
+
+  "GROQ_API_KEY is empty"
+    → Fill it in .env (same key the CLI uses).
+
+  CORS error in browser console
+    → Use the Vite dev server (npm run dev). It proxies /api →
+      backend, bypassing CORS entirely.
+    → If hitting the backend directly from another origin, add that
+      origin to src/web/app.py's CORSMiddleware allow_origins list.
+
+  "address already in use :8000"
+    → python -m src.cli serve --port 8001
+      (then update web/vite.config.ts proxy target to match)
+
+═══════════════════════════════════════════════════════════════════

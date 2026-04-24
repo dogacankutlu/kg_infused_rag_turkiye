@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-neutral-50 text-neutral-800 font-sans antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-neutral-200 rounded-xl shadow-sm;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
+           bg-turkiye-red text-white font-medium hover:bg-turkiye-red-dark
+           disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
+           bg-white border border-neutral-300 text-neutral-700 font-medium
+           hover:bg-neutral-100 transition-colors;
+  }
+  .chip {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full
+           bg-neutral-100 text-neutral-700 border border-neutral-200;
+  }
+  .chip-red {
+    @apply bg-turkiye-red-light text-turkiye-red-dark border-turkiye-red/20;
+  }
+  .input {
+    @apply w-full px-3 py-2 border border-neutral-300 rounded-lg
+           focus:outline-none focus:ring-2 focus:ring-turkiye-red/30 focus:border-turkiye-red
+           placeholder:text-neutral-400;
+  }
+}

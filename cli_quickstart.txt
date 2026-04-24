@@ -1,0 +1,240 @@
+═══════════════════════════════════════════════════════════════════
+  KG-INFUSED RAG — TÜRKIYE DOMAIN  |  CLI QUICKSTART GUIDE
+═══════════════════════════════════════════════════════════════════
+
+  Everything you need to start the system, ask questions, run
+  evaluations, and shut things down cleanly.
+
+───────────────────────────────────────────────────────────────────
+  STEP 1  —  START NEO4J
+───────────────────────────────────────────────────────────────────
+
+  1. Open Neo4j Desktop (it's an app, find it in Applications or
+     your taskbar).
+
+  2. Find your database (e.g. "turkiye-kg") and click the green
+     START button.
+
+  3. Wait until the status shows a green "Running" indicator.
+     This usually takes 10–20 seconds.
+
+  You only need to do this once per session. Neo4j must be running
+  before any CLI command will work.
+
+
+───────────────────────────────────────────────────────────────────
+  STEP 2  —  OPEN TERMINAL & ACTIVATE THE VIRTUAL ENVIRONMENT
+───────────────────────────────────────────────────────────────────
+
+  Open Terminal (or your IDE terminal) and run:
+
+    cd "/Users/hardokut/Desktop/Social Networks Term Project/kg_infused_rag_turkiye"
+    source .venv/bin/activate
+
+  You will see (.venv) appear at the start of your terminal prompt.
+  This means the virtual environment is active.
+
+  ⚠️  You must do this every time you open a new terminal window.
+      Without it, commands will fail or use the wrong Python.
+
+
+───────────────────────────────────────────────────────────────────
+  STEP 3  —  VERIFY EVERYTHING IS CONNECTED  (optional but safe)
+───────────────────────────────────────────────────────────────────
+
+    python -m src.cli check-neo4j
+
+  Expected output:
+    Neo4j Connected!
+
+  If it says "Connection refused", go back to Step 1 and make sure
+  the database is running in Neo4j Desktop.
+
+    python -m src.cli stats
+
+  Expected output:
+    Filtered dataset: entities: 57,427  triples: 114,147
+    Neo4j live:       entities: ...     relations: ...
+
+
+───────────────────────────────────────────────────────────────────
+  STEP 4  —  ASK A SINGLE QUESTION
+───────────────────────────────────────────────────────────────────
+
+  Basic usage (question only):
+
+    python -m src.cli ask "Galatasaray'ın teknik direktörünün doğum yeri neresidir?"
+
+  With optional gold answer and metadata (for metrics):
+
+    python -m src.cli ask "Galatasaray'ın teknik direktörünün doğum yeri neresidir?" \
+        --gold "İstanbul" \
+        --domain football \
+        --difficulty 2-hop
+
+  What you will see:
+    • The question and gold answer
+    • Seed entities found (entity ID, name, score)
+    • Spreading activation rounds (which triples the LLM selected)
+    • KG summary paragraph
+    • Retrieved passages (original + expanded query results)
+    • Final answer
+    • Metrics (EM, F1, Accuracy, Retrieval-Recall) if --gold was given
+
+  The run is automatically saved to:
+    logs/success/YYYY-MM-DD.jsonl   (if answer looks correct)
+    logs/failure/YYYY-MM-DD.jsonl   (if answer is wrong or errored)
+
+
+───────────────────────────────────────────────────────────────────
+  STEP 5  —  INTERACTIVE MODE  (ask many questions in a row)
+───────────────────────────────────────────────────────────────────
+
+    python -m src.cli interactive
+
+  You will see a prompt:
+    >
+
+  Type any Turkish question and press Enter:
+    > Koç Holding'in kurucusunun doğum yeri neresidir?
+    > Kış Uykusu filminin yönetmeninin uyruğu nedir?
+    > Topkapı Sarayı hangi şehirdedir?
+
+  To exit interactive mode:
+    > quit
+    or press Ctrl+C
+
+
+───────────────────────────────────────────────────────────────────
+  STEP 6  —  RUN THE FULL EVALUATION  (all 50 questions)
+───────────────────────────────────────────────────────────────────
+
+    python -m src.cli eval
+
+  This runs all 50 questions from questions/turkiye_qa.json one by
+  one, prints the trace for each, then shows a summary table like:
+
+    group               n    Acc     F1     EM     Retrieval-Recall
+    ───────────────────────────────────────────────────────────────
+    overall            50   0.72   0.68   0.61        0.85
+    domain:football    12   0.83   0.79   0.71        0.90
+    domain:cinema       8   0.75   0.70   0.63        0.88
+    ...
+
+  Results are saved to:
+    logs/eval_YYYYMMDDTHHMMSS.csv         ← per-question scores
+    logs/eval_YYYYMMDDTHHMMSS_summary.json ← aggregate + per-group
+
+  To run only the first 10 questions (useful for quick testing):
+
+    python -m src.cli eval --limit 10
+
+
+───────────────────────────────────────────────────────────────────
+  STEP 7  —  VERIFY QA PATHS IN NEO4J  (before submitting)
+───────────────────────────────────────────────────────────────────
+
+  The assignment requires every question's reasoning path to exist
+  in the dataset. This tool checks all 50 questions:
+
+    python -m tools.verify_qa
+
+  Expected output per question:
+    PASS  TR_001  Galatasaray'ın menajerinin doğum yeri neresidir?
+    FAIL  TR_017  ...
+
+  Fix any FAILs by updating the gold answer or reasoning path in
+  questions/turkiye_qa.json before running the evaluation.
+
+
+───────────────────────────────────────────────────────────────────
+  SWITCHING THE LLM: GROQ → OLLAMA
+───────────────────────────────────────────────────────────────────
+
+  To use a local Ollama model instead of Groq (no internet needed):
+
+  1. Make sure Ollama is installed and running:
+       ollama serve          (in a separate terminal)
+       ollama pull llama3.1  (one-time download)
+
+  2. Prefix any command with the provider override:
+       LLM_PROVIDER=ollama LLM_MODEL=llama3.1 python -m src.cli ask "..."
+       LLM_PROVIDER=ollama LLM_MODEL=llama3.1 python -m src.cli interactive
+
+  Or set it permanently in your .env file:
+       LLM_PROVIDER=ollama
+       LLM_MODEL=llama3.1
+
+
+───────────────────────────────────────────────────────────────────
+  SHUTTING DOWN
+───────────────────────────────────────────────────────────────────
+
+  1. Exit the CLI:
+       • In interactive mode: type  quit  or press Ctrl+C
+       • For any other command: it exits automatically when done
+
+  2. Deactivate the virtual environment:
+       deactivate
+
+  3. Stop Neo4j:
+       Open Neo4j Desktop → click the STOP button on your database.
+       (Optional — Neo4j can be left running, it uses minimal CPU
+       when idle.)
+
+
+───────────────────────────────────────────────────────────────────
+  QUICK REFERENCE  —  ALL COMMANDS
+───────────────────────────────────────────────────────────────────
+
+  Setup (one-time per terminal session):
+    source .venv/bin/activate
+
+  Check everything is working:
+    python -m src.cli check-neo4j
+    python -m src.cli stats
+
+  Ask questions:
+    python -m src.cli ask "your question here"
+    python -m src.cli ask "your question" --gold "answer" --domain football --difficulty 2-hop
+    python -m src.cli interactive
+
+  Evaluate:
+    python -m src.cli eval
+    python -m src.cli eval --limit 10
+
+  Verify QA dataset paths:
+    python -m tools.verify_qa
+
+  One-time data pipeline (already done — only re-run if needed):
+    python -m src.cli extract-turkiye
+    python -m src.cli load-neo4j
+
+  Run tests:
+    python -m pytest tests/ -q
+
+
+───────────────────────────────────────────────────────────────────
+  TROUBLESHOOTING
+───────────────────────────────────────────────────────────────────
+
+  "Neo4j Connection refused"
+    → Neo4j Desktop database is not running. Go to Step 1.
+
+  "GROQ_API_KEY is empty"
+    → Open .env and add your Groq API key.
+    → Get a key at: https://console.groq.com
+
+  "ModuleNotFoundError"
+    → Virtual environment is not active.
+    → Run: source .venv/bin/activate
+
+  "FileNotFoundError: turkiye_entities.jsonl"
+    → Processed data is missing.
+    → Run: python -m src.cli extract-turkiye
+
+  Command hangs for more than 2 minutes
+    → Check your internet connection (Groq is a cloud API).
+    → Or switch to Ollama for offline use (see switching section).
+
+═══════════════════════════════════════════════════════════════════

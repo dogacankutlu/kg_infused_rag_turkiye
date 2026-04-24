@@ -1,0 +1,321 @@
+{
+  "turkiye_entity_id": "Q43",
+  "total_entities": 57427,
+  "reachable_via_relations": 23975,
+  "keyword_matched": 55544,
+  "total_triples": 114147,
+  "top_relations": [
+    [
+      "country",
+      21437
+    ],
+    [
+      "country of citizenship",
+      13842
+    ],
+    [
+      "member of sports team",
+      10124
+    ],
+    [
+      "located in the administrative territorial entity",
+      9537
+    ],
+    [
+      "located in time zone",
+      9197
+    ],
+    [
+      "place of birth",
+      8632
+    ],
+    [
+      "instance of",
+      4686
+    ],
+    [
+      "diplomatic relation",
+      3901
+    ],
+    [
+      "place of death",
+      2931
+    ],
+    [
+      "country of origin",
+      1876
+    ],
+    [
+      "given name",
+      1722
+    ],
+    [
+      "cast member",
+      1506
+    ],
+    [
+      "languages spoken, written or signed",
+      1328
+    ],
+    [
+      "twinned administrative body",
+      1139
+    ],
+    [
+      "part of",
+      1082
+    ],
+    [
+      "headquarters location",
+      997
+    ],
+    [
+      "conflict",
+      942
+    ],
+    [
+      "location",
+      858
+    ],
+    [
+      "educated at",
+      855
+    ],
+    [
+      "shares border with",
+      817
+    ],
+    [
+      "original language of film or TV show",
+      651
+    ],
+    [
+      "sibling",
+      621
+    ],
+    [
+      "child",
+      620
+    ],
+    [
+      "member of political party",
+      587
+    ],
+    [
+      "religion",
+      582
+    ]
+  ],
+  "sample_triples": [
+    {
+      "subject": "Q4720434",
+      "relation": "place of birth",
+      "object": "Q3820",
+      "subject_name": "alex yenikomshian",
+      "object_name": "Beiruit"
+    },
+    {
+      "subject": "Q4752465",
+      "relation": "located in time zone",
+      "object": "Q6760",
+      "subject_name": "Anayurt, Suhut",
+      "object_name": "UTC+3:00"
+    },
+    {
+      "subject": "Q388687",
+      "relation": "place of birth",
+      "object": "Q945363",
+      "subject_name": "Sehmus Ozer",
+      "object_name": "Ergani"
+    },
+    {
+      "subject": "Q7113196",
+      "relation": "country",
+      "object": "Q43",
+      "subject_name": "ovacuma",
+      "object_name": "turkiye"
+    },
+    {
+      "subject": "Q573135",
+      "relation": "member of sports team",
+      "object": "Q608122",
+      "subject_name": "ali bilgin",
+      "object_name": "kayserispor"
+    },
+    {
+      "subject": "Q40434513",
+      "relation": "language of work or name",
+      "object": "Q13955",
+      "subject_name": "sa'id, abu",
+      "object_name": "arabe"
+    },
+    {
+      "subject": "Q4046730",
+      "relation": "owned by",
+      "object": "Q1622293",
+      "subject_name": "petkim",
+      "object_name": "State Oil Company of the Republic of Azerbaijan"
+    },
+    {
+      "subject": "Q7424903",
+      "relation": "country",
+      "object": "Q43",
+      "subject_name": "sarıhalil, polatlı",
+      "object_name": "turkiye"
+    },
+    {
+      "subject": "Q4831229",
+      "relation": "located in time zone",
+      "object": "Q6760",
+      "subject_name": "kuyubaşı, çamlıdere",
+      "object_name": "UTC+3:00"
+    },
+    {
+      "subject": "Q6434833",
+      "relation": "located in the administrative territorial entity",
+      "object": "Q2086353",
+      "subject_name": "kovalı, vezirköprü",
+      "object_name": "andrapa"
+    },
+    {
+      "subject": "Q6048799",
+      "relation": "place of birth",
+      "object": "Q343973",
+      "subject_name": "alinur aktaş",
+      "object_name": "İnegöl"
+    },
+    {
+      "subject": "Q6764162",
+      "relation": "country",
+      "object": "Q43",
+      "subject_name": "ebegümeci, zonguldak",
+      "object_name": "turkiye"
+    },
+    {
+      "subject": "Q4830458",
+      "relation": "located in time zone",
+      "object": "Q6760",
+      "subject_name": "asagiakca, kastamonu",
+      "object_name": "UTC+3:00"
+    },
+    {
+      "subject": "Q3022142",
+      "relation": "country",
+      "object": "Q43",
+      "subject_name": "demirkazık peak",
+      "object_name": "turkiye"
+    },
+    {
+      "subject": "Q337506",
+      "relation": "father",
+      "object": "Q311482",
+      "subject_name": "sangiar",
+      "object_name": "Melikşah"
+    },
+    {
+      "subject": "Q6077382",
+      "relation": "country of citizenship",
+      "object": "Q43",
+      "subject_name": "huseyin capkin",
+      "object_name": "turkiye"
+    },
+    {
+      "subject": "Q642614",
+      "relation": "country of citizenship",
+      "object": "Q12560",
+      "subject_name": "rustem pasha",
+      "object_name": "Ottoman empire"
+    },
+    {
+      "subject": "Q3443162",
+      "relation": "country",
+      "object": "Q224",
+      "subject_name": "Stadion Park mladezi",
+      "object_name": "hirvatistan"
+    },
+    {
+      "subject": "Q516529",
+      "relation": "country",
+      "object": "Q183",
+      "subject_name": "Seligenstadt",
+      "object_name": "Germanz"
+    },
+    {
+      "subject": "Q4827570",
+      "relation": "located in time zone",
+      "object": "Q6760",
+      "subject_name": "Umutlu, Tasova",
+      "object_name": "UTC+3:00"
+    },
+    {
+      "subject": "Q546595",
+      "relation": "conflict",
+      "object": "Q254106",
+      "subject_name": "osman nuri paşa",
+      "object_name": "baltic campaign of 1854"
+    },
+    {
+      "subject": "Q1397172",
+      "relation": "country",
+      "object": "Q43",
+      "subject_name": "örencik, bolu",
+      "object_name": "turkiye"
+    },
+    {
+      "subject": "Q178148",
+      "relation": "place of birth",
+      "object": "Q201101",
+      "subject_name": "Fahri Tatan",
+      "object_name": "Rizounta"
+    },
+    {
+      "subject": "Q33129341",
+      "relation": "country",
+      "object": "Q41",
+      "subject_name": "2017 aegean sea earthquake",
+      "object_name": "hellada"
+    },
+    {
+      "subject": "Q6501864",
+      "relation": "language of work or name",
+      "object": "Q256",
+      "subject_name": "List of people with the surname Kaplan",
+      "object_name": "turcophone"
+    },
+    {
+      "subject": "Q4821161",
+      "relation": "located in the administrative territorial entity",
+      "object": "Q1915508",
+      "subject_name": "dipevler, bolvadin",
+      "object_name": "history of bolvadin"
+    },
+    {
+      "subject": "Q3507442",
+      "relation": "country of origin",
+      "object": "Q36704",
+      "subject_name": "thundering mountains",
+      "object_name": "yugosalvia"
+    },
+    {
+      "subject": "Q586",
+      "relation": "twinned administrative body",
+      "object": "Q33935",
+      "subject_name": "Bonn",
+      "object_name": "Telaviv"
+    },
+    {
+      "subject": "Q6388779",
+      "relation": "given name",
+      "object": "Q16277823",
+      "subject_name": "kenan systems",
+      "object_name": "kenan (first name)"
+    },
+    {
+      "subject": "Q133168",
+      "relation": "spouse",
+      "object": "Q12812195",
+      "subject_name": "orhan gazi",
+      "object_name": "theodora hatun"
+    }
+  ]
+}
