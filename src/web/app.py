@@ -37,28 +37,58 @@ from src.trace import Question
 # Lazy pipeline (heavy to construct — embeddings, BM25 index, Neo4j)
 # ---------------------------------------------------------------------------
 
-_pipeline = None
+_pipelines: dict[str, Any] = {}
 _pipeline_lock = Lock()
+_shared: dict[str, Any] = {}
+
+PIPELINE_KG = "kg_infused"
+PIPELINE_VANILLA = "vanilla"
+PIPELINE_ALIASES = {
+    "kg_infused": PIPELINE_KG,
+    "kg-infused": PIPELINE_KG,
+    "kg_infused_rag": PIPELINE_KG,
+    "kg": PIPELINE_KG,
+    "vanilla": PIPELINE_VANILLA,
+    "vanilla_rag": PIPELINE_VANILLA,
+}
 
 
-def get_pipeline():
-    global _pipeline
-    if _pipeline is not None:
-        return _pipeline
+def _normalize_pipeline(name: str | None) -> str:
+    return PIPELINE_ALIASES.get((name or "").strip().lower(), PIPELINE_KG)
+
+
+def get_pipeline(name: str = PIPELINE_KG):
+    name = _normalize_pipeline(name)
+    if name in _pipelines:
+        return _pipelines[name]
     with _pipeline_lock:
-        if _pipeline is not None:
-            return _pipeline
+        if name in _pipelines:
+            return _pipelines[name]
         from src.llm import get_llm_client
-        from src.rag import KGInfusedRAG
+        from src.rag import KGInfusedRAG, VanillaRAG
 
-        llm = get_llm_client()
-        neo4j = Neo4jClient()
-        seed_finder = SeedFinder()
-        retriever = PassageRetriever()
-        _pipeline = KGInfusedRAG(
-            llm=llm, neo4j=neo4j, seed_finder=seed_finder, retriever=retriever
-        )
-        return _pipeline
+        # Build & cache shared heavy resources once across pipelines.
+        if "llm" not in _shared:
+            _shared["llm"] = get_llm_client()
+        if "retriever" not in _shared:
+            _shared["retriever"] = PassageRetriever()
+
+        if name == PIPELINE_VANILLA:
+            _pipelines[name] = VanillaRAG(
+                llm=_shared["llm"], retriever=_shared["retriever"]
+            )
+        else:
+            if "neo4j" not in _shared:
+                _shared["neo4j"] = Neo4jClient()
+            if "seed_finder" not in _shared:
+                _shared["seed_finder"] = SeedFinder()
+            _pipelines[name] = KGInfusedRAG(
+                llm=_shared["llm"],
+                neo4j=_shared["neo4j"],
+                seed_finder=_shared["seed_finder"],
+                retriever=_shared["retriever"],
+            )
+        return _pipelines[name]
 
 
 # ---------------------------------------------------------------------------
@@ -71,6 +101,7 @@ class AskRequest(BaseModel):
     domain: str = ""
     difficulty: str = "2-hop"
     reasoning_path: list[str] = []
+    pipeline: str = "kg_infused"  # "kg_infused" | "vanilla"
 
 
 # ---------------------------------------------------------------------------
@@ -160,7 +191,7 @@ def health() -> dict[str, str]:
 def ask(req: AskRequest) -> dict[str, Any]:
     if not req.question_text.strip():
         raise HTTPException(status_code=400, detail="question_text is required")
-    pipeline = get_pipeline()
+    pipeline = get_pipeline(req.pipeline)
     q = Question(
         question_id=f"web-{uuid4().hex[:6]}",
         question_text=req.question_text.strip(),

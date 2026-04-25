@@ -3,40 +3,64 @@
 @tailwind utilities;
 
 @layer base {
-  html,
-  body,
-  #root {
+  html {
     height: 100%;
   }
   body {
-    @apply bg-neutral-50 text-neutral-800 font-sans antialiased;
+    min-height: 100%;
+    /* Gradient wash: crisp white at top → soft sunrise-orange at bottom */
+    background: linear-gradient(
+      to bottom,
+      #ffffff 0%,
+      #fff8ed 30%,
+      #fed7aa 100%
+    );
+    background-attachment: fixed;
+    @apply text-neutral-800 font-sans antialiased;
+  }
+  #root {
+    min-height: 100vh;
+    @apply flex flex-col;
   }
 }
 
 @layer components {
+  /* Cards — white with a warm-tinted shadow so they lift off the gradient */
   .card {
-    @apply bg-white border border-neutral-200 rounded-xl shadow-sm;
+    @apply bg-white/90 border border-orange-100 rounded-2xl shadow-sm;
   }
+
+  /* Primary button — sunrise orange */
   .btn-primary {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
-           bg-turkiye-red text-white font-medium hover:bg-turkiye-red-dark
-           disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors;
+           bg-warm-500 text-white font-medium
+           hover:bg-warm-600 active:bg-warm-700
+           disabled:bg-neutral-300 disabled:cursor-not-allowed
+           transition-colors shadow-sm;
   }
+
+  /* Secondary button */
   .btn-secondary {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
-           bg-white border border-neutral-300 text-neutral-700 font-medium
-           hover:bg-neutral-100 transition-colors;
+           bg-white border border-orange-200 text-warm-700 font-medium
+           hover:bg-gold-50 transition-colors;
   }
+
+  /* Default chip */
   .chip {
-    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full
-           bg-neutral-100 text-neutral-700 border border-neutral-200;
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium
+           rounded-full bg-orange-50 text-warm-700 border border-orange-200;
   }
-  .chip-red {
-    @apply bg-turkiye-red-light text-turkiye-red-dark border-turkiye-red/20;
+
+  /* Highlighted chip */
+  .chip-warm {
+    @apply bg-gold-100 text-gold-700 border-gold-300;
   }
+
+  /* Text input */
   .input {
-    @apply w-full px-3 py-2 border border-neutral-300 rounded-lg
-           focus:outline-none focus:ring-2 focus:ring-turkiye-red/30 focus:border-turkiye-red
+    @apply w-full px-3 py-2 border border-orange-200 rounded-lg bg-white
+           focus:outline-none focus:ring-2 focus:ring-warm-400/30 focus:border-warm-400
            placeholder:text-neutral-400;
   }
 }

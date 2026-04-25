@@ -90,6 +90,7 @@ export type AskRequest = {
   domain?: string;
   difficulty?: string;
   reasoning_path?: string[];
+  pipeline?: "kg_infused" | "vanilla";
 };
 
 async function jfetch<T>(path: string, init?: RequestInit): Promise<T> {
