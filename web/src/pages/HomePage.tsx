@@ -7,7 +7,7 @@ import KGAnalysisCard from "../components/KGAnalysisCard";
 import PathwayCard from "../components/PathwayCard";
 import CypherQueriesCard from "../components/CypherQueriesCard";
 import { Tabs } from "../App";
-import { usePipeline } from "../lib/pipeline";
+import { usePipeline, pipelineKey } from "../lib/pipeline";
 import { useTypewriter } from "../lib/useTypewriter";
 
 const PLACEHOLDER_PHRASES = [
@@ -244,9 +244,6 @@ function SampleQuestions({ onSelect }: { onSelect: (q: string) => void }) {
                                     {q.domain}
                                   </span>
                                 )}
-                                {q.gold_answer && (
-                                  <GoldBadge title={`Gold: ${q.gold_answer}`} />
-                                )}
                               </div>
                             </div>
                           </button>
@@ -266,16 +263,32 @@ function SampleQuestions({ onSelect }: { onSelect: (q: string) => void }) {
 
 /* ── Result View ── */
 function ResultView({ result }: { result: RAGResult }) {
-  const isVanilla = (result.pipeline || "").toLowerCase().includes("vanilla");
+  const kind = pipelineKey(result.pipeline || "");
 
   return (
     <div className="space-y-5">
       {/* Row 1: Final Answer — full width */}
       <AnswerBlock result={result} />
 
-      {isVanilla ? (
+      {kind === "no_retrieval" && (
+        <NoRetrievalNotice />
+      )}
+
+      {kind === "vanilla" && (
         <RetrievedPassagesCard result={result} />
-      ) : (
+      )}
+
+      {kind === "vanilla_qe" && (
+        <>
+          <ExpandedQueryCard
+            original={result.retrieval.original_query}
+            expanded={result.retrieval.expanded_query}
+          />
+          <RetrievedPassagesCard result={result} />
+        </>
+      )}
+
+      {kind === "kg_infused" && (
         // Two-column layout — left column: KG Analysis + Knowledge Path,
         // right column: Pathway + Cypher Queries.
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
@@ -295,6 +308,53 @@ function ResultView({ result }: { result: RAGResult }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── No-Retrieval Notice ── */
+function NoRetrievalNotice() {
+  return (
+    <div className="card p-5 bg-gradient-to-br from-peach-50 to-red-50 border-red-200">
+      <h2 className="text-xs font-bold uppercase tracking-widest text-red-600 mb-1">
+        No-Retrieval Baseline
+      </h2>
+      <p className="text-sm text-neutral-700">
+        This run used the LLM's parametric memory only — no knowledge graph,
+        no passage retrieval, no augmentation. Use this as the lower-bound
+        baseline when comparing against the other pipelines.
+      </p>
+    </div>
+  );
+}
+
+/* ── Expanded Query Card (Vanilla-QE) ── */
+function ExpandedQueryCard({
+  original,
+  expanded,
+}: {
+  original: string;
+  expanded: string;
+}) {
+  return (
+    <div className="card p-5">
+      <h2 className="text-xs font-bold uppercase tracking-widest text-burnt-600 mb-3">
+        Query Expansion
+      </h2>
+      <dl className="space-y-2 text-sm">
+        <div>
+          <dt className="text-[10px] uppercase tracking-widest text-neutral-400 mb-0.5">
+            Original
+          </dt>
+          <dd className="text-neutral-800">{original}</dd>
+        </div>
+        <div>
+          <dt className="text-[10px] uppercase tracking-widest text-neutral-400 mb-0.5">
+            Expanded (LLM, no KG)
+          </dt>
+          <dd className="text-neutral-800 italic">{expanded || "—"}</dd>
+        </div>
+      </dl>
     </div>
   );
 }
@@ -343,21 +403,3 @@ function RetrievedPassagesCard({ result }: { result: RAGResult }) {
   );
 }
 
-/* ── Gold-answer indicator pill ── */
-function GoldBadge({ title }: { title?: string }) {
-  return (
-    <span
-      title={title}
-      aria-label="Has gold answer"
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md
-                 text-[9px] font-bold uppercase tracking-wider
-                 bg-gradient-sunset text-white shadow-peachGlow
-                 border border-burnt-400/40"
-    >
-      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5" fill="currentColor">
-        <path d="M12 2 14.39 8.36 21 9.27l-4.84 4.72L17.51 21 12 17.77 6.49 21l1.36-7.01L3 9.27l6.61-.91L12 2z" />
-      </svg>
-      Gold
-    </span>
-  );
-}

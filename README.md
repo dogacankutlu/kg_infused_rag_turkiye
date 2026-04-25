@@ -3,25 +3,61 @@
 CSE 474 / 5074 Social Network Analysis term project. Implements the KG-Infused
 RAG framework (Wu et al., 2025) over Wikidata5M, focused on the Türkiye domain.
 
-## What this implements (Phase 1)
+## What this implements
 
-- **KG-Infused RAG** pipeline (only pipeline implemented now):
-  1. Seed entity detection (BM25 + multilingual embeddings + alias match)
-  2. KG-guided spreading activation (Neo4j traversal + LLM triple selection)
-  3. Subgraph summarization
-  4. KG-based query expansion + dual-query BM25 retrieval over Wikidata5M descriptions
-  5. Passage-note construction → KG-augmented note → final answer
-- **CLI-only** interface (rich-powered console output showing every stage)
+### Four interchangeable RAG pipelines (assignment §6 ablation)
+
+All four are concrete subclasses of the `RAGPipeline` ABC, share the same
+`RAGResult` trace contract, and are selectable from the web UI's hidden header
+dropdown or the CLI `--pipeline` flag:
+
+| Pipeline | Description | Modules used |
+|---|---|---|
+| **KG-Infused RAG** | Full pipeline: seeds → spreading activation → KG summary → KG-expanded BM25 → KG-augmented note → answer | All Modules 1-3 |
+| **Vanilla RAG** | BM25 retrieval over the original question only → passage note → answer | retriever + note + answer |
+| **Vanilla + Query Expansion** | Pure-LLM rewrite (no KG) → dual BM25 → passage note → answer | retriever + LLM rewriter |
+| **No-Retrieval Baseline** | LLM answers from parametric memory only — lower-bound baseline | LLM only |
+
+Detail of the KG-Infused pipeline:
+1. Seed entity detection (BM25 + multilingual embeddings + alias match)
+2. KG-guided spreading activation (Neo4j traversal + LLM triple selection)
+3. Subgraph summarization
+4. KG-based query expansion + dual-query BM25 retrieval over Wikidata5M descriptions
+5. Passage-note construction → KG-augmented note → final answer
+
+### Cross-cutting features
+
 - **LLM abstraction** — one env var swaps Groq for a local Ollama model
 - **Metrics**: Exact Match, token F1, lenient Accuracy, Retrieval Recall
-- **Logging**: every successful / failed attempt appended to `logs/{success,failure}/*.jsonl`
-- **QA dataset**: 50 Turkish multi-hop questions (30 × 2-hop, 15 × 3-hop, 5 × comparison)
+  (per-pipeline, side-by-side in the web Evaluation tab)
+- **Logging**: every successful / failed attempt appended to `logs/{success,failure}/*.jsonl`,
+  tagged with the pipeline that produced it; verdict recomputed on read so
+  "no information" answers are always classified as failures
+- **QA dataset**: 100+ Turkish multi-hop questions across ~20 domains
+  (single-hop / 2-hop / 3-hop / comparison)
 
-Phase 2 (web UI) is **implemented** — a FastAPI backend (`src/web/app.py`) reuses
-the same pipeline, and a React + Vite + Tailwind frontend (`web/`) provides a Home
-page (ask + spreading-activation graph + distribution charts) and a History page
-(stats, top relations, sample triplets, QA dataset, Cypher catalog, recent runs).
-See [`web_quickstart.txt`](./web_quickstart.txt).
+### Web UI (FastAPI + React)
+
+A FastAPI backend (`src/web/app.py`) exposes the same four pipelines, a
+verifier endpoint, history, stats, and evaluation. A React + Vite + Tailwind
+frontend (`web/`) provides:
+
+- **Ask page** — question input with animated typewriter placeholder; result
+  view adapts per pipeline (NoR shows just the answer; Vanilla adds passages;
+  Vanilla-QE adds an expanded-query card; KG-Infused renders the full
+  two-column knowledge-graph analysis with a Cytoscape.js graph)
+- **History → Recent Runs** — every attempt with method chip, status, and a
+  one-word *Failure Reason* column (Timeout / Rate Limit / DB Down / KG Error /
+  LLM Error / No Seeds / No Info / …)
+- **History → Evaluation & Metrics** — four success-rate cards (one per
+  pipeline) plus a comparison table that highlights the per-metric winner;
+  dataset overview (domain pie, difficulty histogram, top relations,
+  searchable triple table) sits directly underneath
+- **History → Dataset & Validation** — Question Verifier (shape + KG seed +
+  BM25 reachability checks, no LLM call) on top, full QA dataset table below
+  (filterable by domain + difficulty, grouped by hop count)
+
+See [`web_quickstart.txt`](./web_quickstart.txt) for how to run it locally.
 
 ## Repo layout
 
@@ -29,7 +65,7 @@ See [`web_quickstart.txt`](./web_quickstart.txt).
 config/            settings (pydantic-settings, env-driven)
 src/llm/           LLMClient ABC, Groq & Ollama implementations, factory
 src/kg/            Neo4j client, extractor, loader, seed finder
-src/rag/           KG-Infused pipeline + all sub-modules (Modules 1-3)
+src/rag/           Four RAG pipelines (kg_infused, vanilla, vanilla_qe, no_retrieval) + sub-modules
 src/prompts/       centralized prompt templates
 src/trace/         dataclasses with to_dict() + rich console renderer
 src/eval/          metrics + evaluator
@@ -39,7 +75,7 @@ src/web/           FastAPI app (reuses the pipeline, serves /api/*)
 web/               React + Vite + Tailwind frontend (Home + History pages)
 tests/             pytest smoke tests
 tools/verify_qa.py verifies each QA path exists in Neo4j before eval
-questions/         turkiye_qa.json (50 Turkish multi-hop questions)
+questions/         turkiye_qa.json (100+ Turkish multi-hop questions, ~20 domains)
 data/raw/          you extract the Wikidata5M archives here
 data/processed/    filtered Türkiye subgraph (produced by extract-turkiye)
 logs/              run logs + eval CSV/JSON outputs
@@ -109,7 +145,7 @@ python -m src.cli ask "Galatasaray'ın teknik direktörünün doğum yeri neresi
 # REPL
 python -m src.cli interactive
 
-# Full evaluation over all 50 questions
+# Full evaluation across all four pipelines
 python -m src.cli eval
 # CSV + summary JSON written under logs/eval_<timestamp>.*
 
@@ -172,39 +208,22 @@ Covers: LLM factory contract, metric normalization (Turkish-aware), trace
 serialization round-trip, spreading-activation state machine (with fake
 neo4j + fake LLM).
 
-## Phase 2 — Web UI (design only, not built)
+## Architecture guarantees
 
-The Phase-1 architecture is deliberately structured so a web UI is an
-additive layer. Key guarantees that Phase-2 will rely on:
-
-- `RAGResult.to_dict()` already produces a fully JSON-serializable trace.
-  A FastAPI `POST /ask` route returns it unchanged.
-- `src/trace/console.py` is the **only** module that imports `rich`. Delete
-  it and nothing breaks — the business logic has no CLI coupling.
-- `src/kg/turkey_extractor.py` already produces `stats.json` with entity
-  counts, top relations, domain histogram, and sample triplets — the Home
-  and History pages read from this file directly.
+- `RAGResult.to_dict()` produces a fully JSON-serializable trace; the FastAPI
+  `POST /ask` route returns it unchanged.
+- `src/trace/console.py` is the **only** module that imports `rich` — the
+  business logic has zero CLI coupling, which is what lets the same pipeline
+  drive both the CLI and the web UI.
+- `src/kg/turkey_extractor.py` produces `stats.json` (entity counts, top
+  relations, domain histogram, sample triplets) — read directly by the web
+  Overview section.
 - Run logs in `logs/{success,failure}/*.jsonl` are the source of truth for
-  the History page; `RunLogger.iter_attempts()` already exists.
-
-When we build the web UI, the planned additions are:
-
-- **Backend**: `src/web/app.py` (FastAPI) with endpoints `POST /ask`,
-  `GET /history`, `GET /stats`, `GET /domains`, `GET /questions`,
-  `GET /queries`. No changes to `src/rag/*`.
-- **Frontend**: React + Vite + TypeScript, light-mode Tailwind theme (neutral
-  greys, Türkiye-flag-red `#E30A17` for primary actions).
-- **Pages**:
-  - **Home** (`/`): question input → live streaming trace; seed cards,
-    spreading-activation graph (Cytoscape.js), entity distribution bar
-    chart (Recharts), answer block with gold comparison.
-  - **History** (`/history`): tabs for Statistics Summary (counts, domains),
-    Top Relations (bar chart of country/place-of-birth/head-coach/etc.),
-    Sample Triplets (searchable raw `<s | r | o>` table), QA Dataset
-    (filterable by 2-hop / 3-hop / comparison), Cypher Query Catalog
-    (template count, max hops, average retrieval time pulled from run logs).
-
-No Phase-2 code ships in this increment.
+  the Recent Runs and Evaluation tabs; `RunLogger.iter_attempts()` is the
+  single reader.
+- Pipeline factory dispatch in `src/web/app.py::get_pipeline()` shares one
+  cached LLM / retriever / Neo4j / seed-finder across all four pipelines, so
+  the web server doesn't pay the load cost more than once.
 
 ## Assignment mapping
 
@@ -212,10 +231,10 @@ No Phase-2 code ships in this increment.
 |---|---|
 | Phase 1 — Dataset exploration, §2 | `src/kg/turkey_extractor.py` + `stats.json` |
 | Phase 2 — Domain selection, §3 | covered by `stats.json` + README notes |
-| Phase 3 — Multi-hop questions, §4 | `questions/turkiye_qa.json` + `tools/verify_qa.py` |
-| Phase 4 — KG-Infused RAG, §5 | `src/rag/kg_infused.py` + modules |
-| Phase 5 — Experiments, §6 | `src/eval/evaluator.py` (baselines Ollama/Groq compare; vanilla RAG pluggable via `RAGPipeline` ABC) |
-| Phase 6 — Case study, §7 | run logs → pick successes/failures from `logs/success|failure/*.jsonl` |
+| Phase 3 — Multi-hop questions, §4 | `questions/turkiye_qa.json` + `tools/verify_qa.py` + web Question Verifier |
+| Phase 4 — KG-Infused RAG, §5 | `src/rag/kg_infused.py` + Modules 1-3 sub-modules |
+| Phase 5 — Experiments, §6 | All four pipelines (`kg_infused`, `vanilla`, `vanilla_qe`, `no_retrieval`) selectable via the web dropdown or CLI; `src/eval/evaluator.py` aggregates per-pipeline metrics |
+| Phase 6 — Case study, §7 | run logs → Recent Runs view with Failure-Reason classification (Timeout / DB Down / KG Error / No Info / …) |
 
 ## License / credits
 

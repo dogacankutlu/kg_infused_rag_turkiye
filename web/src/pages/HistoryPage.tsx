@@ -12,18 +12,66 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { api } from "../lib/api";
-import { labelFor } from "../lib/pipeline";
+import { api, type VerifyResponse } from "../lib/api";
+import {
+  labelFor,
+  pipelineKey,
+  PIPELINE_IDS,
+  PIPELINE_LABELS,
+  PIPELINE_SHORT,
+  PIPELINE_TONES,
+  type PipelineId,
+} from "../lib/pipeline";
 import { Tabs } from "../App";
 
-type Tab = "overview" | "qa" | "runs" | "evaluation";
+// Top-level tabs after consolidation:
+//   runs        — Recent Runs (with Failure Reason column)
+//   evaluation  — Evaluation & Metrics + dataset Overview underneath
+//   dataset     — Dataset & Validation: Question Verifier + QA Dataset
+type Tab = "runs" | "evaluation" | "dataset";
 
 const SUBTABS: { id: Tab; label: string }[] = [
   { id: "runs", label: "Recent Runs" },
   { id: "evaluation", label: "Evaluation & Metrics" },
-  { id: "overview", label: "Overview" },
-  { id: "qa", label: "QA Dataset" },
+  { id: "dataset", label: "Dataset & Validation" },
 ];
+
+// Map a raw error / no-info answer to a 1-2 word failure tag.
+function failureReason(r: {
+  error?: string;
+  answer?: string;
+  verdict?: string;
+}): string {
+  if (r.verdict !== "failure") return "";
+  const err = (r.error || "").toLowerCase();
+  if (err) {
+    if (err.includes("timeout") || err.includes("timed out")) return "Timeout";
+    if (err.includes("rate limit") || err.includes("ratelimit")) return "Rate Limit";
+    if (err.includes("unauthorized") || err.includes("api key") || err.includes("401"))
+      return "Auth";
+    if (err.includes("serviceunavailable") || err.includes("connection") || err.includes("refused"))
+      return "DB Down";
+    if (err.includes("neo4j") || err.includes("cypher")) return "KG Error";
+    if (err.includes("groq") || err.includes("ollama") || err.includes("llm"))
+      return "LLM Error";
+    if (err.includes("seed") || err.includes("no seeds")) return "No Seeds";
+    if (err.includes("retriev")) return "Retrieval";
+    if (err.includes("parse") || err.includes("json")) return "Parse";
+    return "Error";
+  }
+  // No raw error but answer flagged "no info" by the verdict logic.
+  const ans = (r.answer || "").toLowerCase();
+  if (!ans) return "Empty";
+  if (
+    ans.includes("bilgi bulunmamaktadır") ||
+    ans.includes("bilgi yok") ||
+    ans.includes("no information") ||
+    ans.includes("don't know") ||
+    ans.includes("dont know")
+  )
+    return "No Info";
+  return "Wrong";
+}
 
 // Warm amber/orange chart palette
 const WARM_COLORS = [
@@ -62,10 +110,19 @@ export default function HistoryPage() {
         ))}
       </div>
 
-      {tab === "overview" && <OverviewTab />}
-      {tab === "qa" && <QATab />}
       {tab === "runs" && <RunsTab />}
-      {tab === "evaluation" && <EvaluationTab />}
+      {tab === "evaluation" && (
+        <div className="space-y-8">
+          <EvaluationTab />
+          <OverviewTab />
+        </div>
+      )}
+      {tab === "dataset" && (
+        <div className="space-y-8">
+          <VerifierTab />
+          <QATab />
+        </div>
+      )}
     </div>
   );
 }
@@ -350,10 +407,7 @@ function QATab() {
                           <span className="chip">{q.domain}</span>
                         </td>
                         <td className="px-4 py-2">
-                          <div className="flex items-center gap-1.5">
-                            <span className="chip chip-warm">{q.difficulty}</span>
-                            {q.gold_answer && <InlineGoldBadge />}
-                          </div>
+                          <span className="chip chip-warm">{q.difficulty}</span>
                         </td>
                       </tr>
                     );
@@ -415,11 +469,13 @@ function RunsTab() {
                 <th className="px-4 py-3">Answer</th>
                 <th className="px-4 py-3">⏱</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Failure Reason</th>
               </tr>
             </thead>
             <tbody>
               {data.attempts.map((r, i) => {
                 const ok = r.verdict === "success";
+                const reason = failureReason(r);
                 return (
                   <tr
                     key={i}
@@ -432,16 +488,10 @@ function RunsTab() {
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
                       {(() => {
-                        const isVanilla = (r.pipeline || "")
-                          .toLowerCase()
-                          .includes("vanilla");
+                        const tone = PIPELINE_TONES[pipelineKey(r.pipeline)].chip;
                         return (
                           <span
-                            className={`chip text-[10px] ${
-                              isVanilla
-                                ? "bg-gold-100 text-gold-700 border-gold-300"
-                                : "bg-orange-50 text-warm-700 border-orange-200"
-                            }`}
+                            className={`chip text-[10px] ${tone}`}
                             title={r.pipeline}
                           >
                             {labelFor(r.pipeline)}
@@ -469,6 +519,18 @@ function RunsTab() {
                       >
                         {ok ? "Successful" : "Failed"}
                       </span>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {reason ? (
+                        <span
+                          className="chip text-[10px] bg-red-50 text-red-700 border-red-200"
+                          title={r.error || r.answer || ""}
+                        >
+                          {reason}
+                        </span>
+                      ) : (
+                        <span className="text-neutral-300">—</span>
+                      )}
                     </td>
                   </tr>
                 );
@@ -517,25 +579,46 @@ function EvaluationTab() {
   if (error) return <ErrorMsg msg={(error as Error).message} />;
   if (!data) return null;
 
-  const kg = data.pipelines.find((p) => p.pipeline === "kg_infused");
-  const va = data.pipelines.find((p) => p.pipeline === "vanilla");
+  const byId = new Map<PipelineId, (typeof data.pipelines)[number]>();
+  for (const p of data.pipelines) byId.set(p.pipeline as PipelineId, p);
 
   const fmtPct = (v: number) => `${(v * 100).toFixed(1)}%`;
   const fmtNum = (v: number) => v.toFixed(3);
 
-  const metricRows: { key: keyof NonNullable<typeof kg>["metrics"]; label: string }[] = [
+  const metricRows: {
+    key: "accuracy" | "f1" | "em" | "retrieval_recall";
+    label: string;
+  }[] = [
     { key: "accuracy", label: "Accuracy" },
     { key: "f1", label: "F1 Score" },
     { key: "em", label: "Exact Match" },
     { key: "retrieval_recall", label: "Retrieval Recall" },
   ];
 
-  const winnerClass = (a: number, b: number) =>
-    a > b ? "text-warm-600 font-bold" : "text-neutral-700";
+  const totalGold = PIPELINE_IDS.reduce(
+    (s, id) => s + (byId.get(id)?.with_gold ?? 0),
+    0
+  );
+
+  // For each metric row find the winner among the 4 pipelines.
+  const winnerOf = (
+    key: "accuracy" | "f1" | "em" | "retrieval_recall"
+  ): PipelineId | null => {
+    let best: PipelineId | null = null;
+    let bestVal = -Infinity;
+    for (const id of PIPELINE_IDS) {
+      const v = byId.get(id)?.metrics[key] ?? 0;
+      if (v > bestVal) {
+        bestVal = v;
+        best = id;
+      }
+    }
+    return bestVal > 0 ? best : null;
+  };
 
   return (
     <div className="space-y-5">
-      {/* Performance Overview Box — side-by-side success rate */}
+      {/* Performance Overview — 4 cards, one per pipeline */}
       <div className="card p-5">
         <div className="flex items-baseline justify-between mb-4">
           <h3 className="text-xs font-bold uppercase tracking-widest text-warm-500">
@@ -545,27 +628,24 @@ function EvaluationTab() {
             Overall correctness rate across logged runs
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PipelineSuccessCard
-            title="KG-Infused RAG"
-            tone="warm"
-            successRate={kg?.success_rate ?? 0}
-            runs={kg?.runs ?? 0}
-            successes={kg?.successes ?? 0}
-            elapsed={kg?.avg_elapsed_seconds ?? 0}
-          />
-          <PipelineSuccessCard
-            title="Vanilla RAG"
-            tone="gold"
-            successRate={va?.success_rate ?? 0}
-            runs={va?.runs ?? 0}
-            successes={va?.successes ?? 0}
-            elapsed={va?.avg_elapsed_seconds ?? 0}
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {PIPELINE_IDS.map((id) => {
+            const p = byId.get(id);
+            return (
+              <PipelineSuccessCard
+                key={id}
+                id={id}
+                successRate={p?.success_rate ?? 0}
+                runs={p?.runs ?? 0}
+                successes={p?.successes ?? 0}
+                elapsed={p?.avg_elapsed_seconds ?? 0}
+              />
+            );
+          })}
         </div>
       </div>
 
-      {/* Metric Comparison Table */}
+      {/* Metric Comparison Table — 4 pipeline columns */}
       <div className="card p-5">
         <div className="flex items-baseline justify-between mb-3">
           <h3 className="text-xs font-bold uppercase tracking-widest text-warm-500">
@@ -576,7 +656,7 @@ function EvaluationTab() {
           </span>
         </div>
 
-        {(!kg || !kg.with_gold) && (!va || !va.with_gold) ? (
+        {totalGold === 0 ? (
           <div className="text-sm text-neutral-500 italic">
             No gold-answer runs logged yet — run questions from the QA Dataset
             (filled gold answers) to populate this table.
@@ -587,16 +667,19 @@ function EvaluationTab() {
               <thead className="text-left text-xs uppercase tracking-wider text-neutral-500">
                 <tr className="border-b border-orange-100">
                   <th className="px-3 py-2 font-semibold">Metric</th>
-                  <th className="px-3 py-2 font-semibold text-right">KG-Infused RAG</th>
-                  <th className="px-3 py-2 font-semibold text-right">Vanilla RAG</th>
-                  <th className="px-3 py-2 font-semibold text-right">Δ</th>
+                  {PIPELINE_IDS.map((id) => (
+                    <th
+                      key={id}
+                      className="px-3 py-2 font-semibold text-right whitespace-nowrap"
+                    >
+                      {PIPELINE_SHORT[id]}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {metricRows.map(({ key, label }) => {
-                  const k = kg?.metrics[key] ?? 0;
-                  const v = va?.metrics[key] ?? 0;
-                  const delta = k - v;
+                  const winner = winnerOf(key);
                   return (
                     <tr
                       key={key}
@@ -605,24 +688,22 @@ function EvaluationTab() {
                       <td className="px-3 py-2.5 font-medium text-neutral-700">
                         {label}
                       </td>
-                      <td className={`px-3 py-2.5 text-right font-mono ${winnerClass(k, v)}`}>
-                        {fmtNum(k)}
-                      </td>
-                      <td className={`px-3 py-2.5 text-right font-mono ${winnerClass(v, k)}`}>
-                        {fmtNum(v)}
-                      </td>
-                      <td
-                        className={`px-3 py-2.5 text-right font-mono text-xs ${
-                          delta > 0
-                            ? "text-green-600"
-                            : delta < 0
-                            ? "text-red-600"
-                            : "text-neutral-400"
-                        }`}
-                      >
-                        {delta > 0 ? "+" : ""}
-                        {fmtNum(delta)}
-                      </td>
+                      {PIPELINE_IDS.map((id) => {
+                        const v = byId.get(id)?.metrics[key] ?? 0;
+                        const isWin = winner === id;
+                        return (
+                          <td
+                            key={id}
+                            className={`px-3 py-2.5 text-right font-mono ${
+                              isWin
+                                ? `${PIPELINE_TONES[id].accent} font-bold`
+                                : "text-neutral-700"
+                            }`}
+                          >
+                            {fmtNum(v)}
+                          </td>
+                        );
+                      })}
                     </tr>
                   );
                 })}
@@ -630,20 +711,23 @@ function EvaluationTab() {
                   <td className="px-3 py-2.5 font-semibold text-neutral-700">
                     Success Rate
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono font-semibold text-warm-700">
-                    {fmtPct(kg?.success_rate ?? 0)}
-                  </td>
-                  <td className="px-3 py-2.5 text-right font-mono font-semibold text-warm-700">
-                    {fmtPct(va?.success_rate ?? 0)}
-                  </td>
-                  <td className="px-3 py-2.5 text-right text-xs text-neutral-400">—</td>
+                  {PIPELINE_IDS.map((id) => (
+                    <td
+                      key={id}
+                      className="px-3 py-2.5 text-right font-mono font-semibold text-warm-700"
+                    >
+                      {fmtPct(byId.get(id)?.success_rate ?? 0)}
+                    </td>
+                  ))}
                 </tr>
               </tbody>
             </table>
             <p className="text-[11px] text-neutral-400 mt-3">
-              KG-Infused mean over <b>{kg?.with_gold ?? 0}</b> gold-answer runs ·
-              Vanilla mean over <b>{va?.with_gold ?? 0}</b> gold-answer runs.
-              Higher is better for all four metrics.
+              {PIPELINE_IDS.map(
+                (id) =>
+                  `${PIPELINE_SHORT[id]}: ${byId.get(id)?.with_gold ?? 0} gold runs`
+              ).join(" · ")}
+              . Higher is better for all four metrics.
             </p>
           </div>
         )}
@@ -653,62 +737,252 @@ function EvaluationTab() {
 }
 
 function PipelineSuccessCard({
-  title,
-  tone,
+  id,
   successRate,
   runs,
   successes,
   elapsed,
 }: {
-  title: string;
-  tone: "warm" | "gold";
+  id: PipelineId;
   successRate: number;
   runs: number;
   successes: number;
   elapsed: number;
 }) {
-  const toneClasses =
-    tone === "warm"
-      ? "bg-gradient-to-br from-orange-50 to-warm-50 border-warm-200"
-      : "bg-gradient-to-br from-gold-50 to-orange-50 border-gold-300";
-  const accent = tone === "warm" ? "text-warm-600" : "text-gold-700";
+  const tones = PIPELINE_TONES[id];
   const pct = `${(successRate * 100).toFixed(1)}%`;
 
   return (
-    <div className={`rounded-2xl border p-5 ${toneClasses}`}>
+    <div className={`rounded-2xl border p-5 ${tones.bg}`}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-semibold text-neutral-800">{title}</span>
+        <span className="text-sm font-semibold text-neutral-800">
+          {PIPELINE_LABELS[id]}
+        </span>
         <span className="text-[10px] uppercase tracking-widest text-neutral-500">
           {runs} runs
         </span>
       </div>
-      <div className={`text-5xl font-extrabold ${accent} tracking-tight`}>
+      <div className={`text-4xl font-extrabold ${tones.accent} tracking-tight`}>
         {pct}
       </div>
       <div className="text-xs text-neutral-600 mt-2">
-        <span className="font-semibold">{successes}</span> successful out of{" "}
-        <span className="font-semibold">{runs}</span> · avg{" "}
+        <span className="font-semibold">{successes}</span> / {runs} · avg{" "}
         <span className="font-mono">{elapsed.toFixed(2)}s</span>
       </div>
     </div>
   );
 }
 
-function InlineGoldBadge() {
+/* ────────────────────────── Question Verifier ────────────────────────── */
+
+function VerifierTab() {
+  const [text, setText] = useState("");
+  const [submitted, setSubmitted] = useState<string | null>(null);
+
+  // Defensive query: any error in `api.verify` lands in `error` instead of
+  // bubbling as an unhandled promise. We never throw inside render.
+  const { data, isLoading, error, refetch, isFetching } = useQuery<VerifyResponse>({
+    queryKey: ["verify", submitted],
+    queryFn: async () => {
+      // Re-trim on the way out so a stray whitespace key never hits the API.
+      const q = (submitted || "").trim();
+      if (!q) throw new Error("Empty question");
+      return api.verify(q);
+    },
+    enabled: !!submitted,
+    retry: false,
+  });
+
+  const onTest = () => {
+    const t = text.trim();
+    if (!t) return;
+    if (t === submitted) {
+      // React Query won't re-run if key is unchanged; force it.
+      void refetch();
+    } else {
+      setSubmitted(t);
+    }
+  };
+
+  // Tolerate any field being missing — older logs / partial responses
+  // shouldn't crash the UI.
+  const checks = data?.checks ?? [];
+  const seeds = data?.seeds ?? [];
+  const passages = data?.passages ?? [];
+
   return (
-    <span
-      title="Has gold answer"
-      aria-label="Has gold answer"
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md
-                 text-[9px] font-bold uppercase tracking-wider
-                 bg-gradient-sunset text-white shadow-peachGlow
-                 border border-burnt-400/40"
-    >
-      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5" fill="currentColor">
-        <path d="M12 2 14.39 8.36 21 9.27l-4.84 4.72L17.51 21 12 17.77 6.49 21l1.36-7.01L3 9.27l6.61-.91L12 2z" />
-      </svg>
-      Gold
-    </span>
+    <div className="space-y-4">
+      <div className="card p-5">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-warm-500 mb-1">
+          Question Verifier
+        </h3>
+        <p className="text-xs text-neutral-500 mb-3">
+          Test a candidate question against the Türkiye subgraph + retrieval
+          corpus before running it through any pipeline. No LLM call is
+          performed — only seed-resolution and BM25 reachability checks.
+        </p>
+
+        {/* How verification works — explains the pass/fail criteria. */}
+        <div className="mb-4 rounded-xl border border-orange-200 bg-gradient-to-br
+                        from-gold-50 to-peach-50 px-4 py-3">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-burnt-700 mb-1.5">
+            How verification works
+          </div>
+          <ul className="text-xs text-neutral-700 space-y-1 list-disc pl-4">
+            <li>
+              <b>Question shape:</b> at least 3 words and 10 characters — too
+              short and the system can't extract enough signal.
+            </li>
+            <li>
+              <b>KG seed entities:</b> the question must mention at least one
+              entity that resolves into the Türkiye-filtered Wikidata5M
+              subgraph (matched by alias + embedding cosine).
+            </li>
+            <li>
+              <b>Passage retrieval:</b> BM25 over filtered descriptions must
+              return at least one above-threshold passage.
+            </li>
+          </ul>
+          <div className="text-[11px] text-neutral-500 mt-2">
+            A question is judged <b>Answerable</b> when shape passes <i>and</i>
+            either KG-seed or passage retrieval succeeds.
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <input
+            className="input flex-1"
+            placeholder="Enter a question to verify…"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                onTest();
+              }
+            }}
+          />
+          <button
+            disabled={!text.trim() || isFetching}
+            onClick={onTest}
+            className="px-4 py-2 rounded-xl font-semibold text-white
+                       bg-gradient-to-br from-gold-400 via-warm-500 to-warm-600
+                       hover:from-gold-500 hover:via-warm-600 hover:to-warm-700
+                       disabled:from-neutral-300 disabled:to-neutral-300
+                       disabled:cursor-not-allowed transition-all shadow-sm"
+          >
+            {isFetching ? "Testing…" : "Test"}
+          </button>
+        </div>
+      </div>
+
+      {isLoading && <Loading />}
+      {error && <ErrorMsg msg={(error as Error).message} />}
+
+      {data && (
+        <div className="card p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <span
+              className={`chip text-[11px] ${
+                data.answerable
+                  ? "bg-green-50 text-green-700 border-green-200"
+                  : "bg-red-50 text-red-700 border-red-200"
+              }`}
+            >
+              {data.answerable ? "Answerable" : "Not Answerable"}
+            </span>
+            <span className="text-xs text-neutral-500">
+              {data.recommendation || ""}
+            </span>
+          </div>
+
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-neutral-400 mb-2">
+              Checks
+            </div>
+            <ul className="space-y-1.5">
+              {checks.map((c, i) => (
+                <li
+                  key={c.id || i}
+                  className="flex items-start gap-2 text-sm border border-orange-100
+                             rounded-lg px-3 py-2 bg-gold-50/40"
+                >
+                  <span
+                    className={`mt-0.5 inline-flex items-center justify-center
+                                w-4 h-4 rounded-full text-[10px] font-bold ${
+                      c.ok
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {c.ok ? "✓" : "✗"}
+                  </span>
+                  <div>
+                    <div className="font-medium text-neutral-800">
+                      {c.label || c.id}
+                    </div>
+                    <div className="text-xs text-neutral-600">{c.detail}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {seeds.length > 0 && (
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-neutral-400 mb-2">
+                Seed Entities ({seeds.length})
+              </div>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {seeds.map((s, i) => (
+                  <li
+                    key={s.entity_id || i}
+                    className="border border-orange-100 rounded-lg px-3 py-2 text-xs
+                               bg-white"
+                  >
+                    <div className="font-semibold text-neutral-800">
+                      {s.name}{" "}
+                      <span className="font-mono text-neutral-400 text-[10px]">
+                        {s.entity_id}
+                      </span>
+                    </div>
+                    <div className="text-neutral-500">
+                      score {Number(s.score ?? 0).toFixed(3)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {passages.length > 0 && (
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-neutral-400 mb-2">
+                Top Retrieved Passages ({passages.length})
+              </div>
+              <ol className="space-y-2">
+                {passages.map((p, i) => (
+                  <li
+                    key={p.entity_id || i}
+                    className="border border-orange-100 rounded-lg overflow-hidden"
+                  >
+                    <div className="px-3 py-1.5 bg-gold-50/60 border-b border-orange-100
+                                    flex items-center justify-between text-xs">
+                      <span className="font-semibold text-neutral-800">
+                        {i + 1}. {p.title || p.entity_id}
+                      </span>
+                      <span className="chip chip-warm text-[10px]">
+                        BM25 {Number(p.score ?? 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

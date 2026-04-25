@@ -4,16 +4,59 @@
 
 import { useEffect, useState } from "react";
 
-export type PipelineId = "kg_infused" | "vanilla";
+export type PipelineId =
+  | "kg_infused"
+  | "vanilla"
+  | "vanilla_qe"
+  | "no_retrieval";
+
+export const PIPELINE_IDS: PipelineId[] = [
+  "kg_infused",
+  "vanilla",
+  "vanilla_qe",
+  "no_retrieval",
+];
 
 export const PIPELINE_LABELS: Record<PipelineId, string> = {
   kg_infused: "KG-Infused RAG",
   vanilla: "Vanilla RAG",
+  vanilla_qe: "Vanilla + Query Expansion",
+  no_retrieval: "No-Retrieval Baseline",
 };
 
 export const PIPELINE_SHORT: Record<PipelineId, string> = {
   kg_infused: "KG-Infused",
   vanilla: "Vanilla",
+  vanilla_qe: "Vanilla-QE",
+  no_retrieval: "No-Retrieval",
+};
+
+// Per-pipeline accent classes (chip background + text + border). Used in the
+// Recent Runs Method column and Evaluation cards.
+export const PIPELINE_TONES: Record<
+  PipelineId,
+  { chip: string; bg: string; accent: string }
+> = {
+  kg_infused: {
+    chip: "bg-warm-100 text-warm-800 border-warm-300",
+    bg: "bg-gradient-to-br from-warm-50 to-tangerine-100 border-warm-300",
+    accent: "text-warm-700",
+  },
+  vanilla: {
+    chip: "bg-gold-100 text-gold-800 border-gold-300",
+    bg: "bg-gradient-to-br from-gold-50 to-peach-100 border-gold-300",
+    accent: "text-gold-700",
+  },
+  vanilla_qe: {
+    chip: "bg-tangerine-100 text-burnt-700 border-tangerine-300",
+    bg: "bg-gradient-to-br from-tangerine-50 to-peach-200 border-tangerine-400",
+    accent: "text-burnt-600",
+  },
+  no_retrieval: {
+    chip: "bg-red-100 text-red-700 border-red-300",
+    bg: "bg-gradient-to-br from-peach-50 to-red-100 border-red-300",
+    accent: "text-red-700",
+  },
 };
 
 const KEY = "rag.pipeline";
@@ -22,7 +65,13 @@ const listeners = new Set<(p: PipelineId) => void>();
 function read(): PipelineId {
   try {
     const v = localStorage.getItem(KEY);
-    if (v === "vanilla") return "vanilla";
+    if (
+      v === "vanilla" ||
+      v === "vanilla_qe" ||
+      v === "no_retrieval" ||
+      v === "kg_infused"
+    )
+      return v;
   } catch {
     /* ignore */
   }
@@ -54,11 +103,16 @@ export function usePipeline(): [PipelineId, (p: PipelineId) => void] {
   return [p, setPipeline];
 }
 
-// Map any backend pipeline string (incl. legacy "kg_infused_rag") to a label.
+// Map any backend pipeline string to a PipelineId for tone/label lookup.
+export function pipelineKey(name: string): PipelineId {
+  const n = (name || "").toLowerCase();
+  if (n.includes("no_retrieval") || n === "nor") return "no_retrieval";
+  if (n.includes("vanilla_qe") || n === "qe") return "vanilla_qe";
+  if (n.includes("vanilla")) return "vanilla";
+  return "kg_infused";
+}
+
 export function labelFor(name: string): string {
   if (!name) return "—";
-  const n = name.toLowerCase();
-  if (n.includes("vanilla")) return PIPELINE_SHORT.vanilla;
-  if (n.includes("kg")) return PIPELINE_SHORT.kg_infused;
-  return name;
+  return PIPELINE_SHORT[pipelineKey(name)];
 }

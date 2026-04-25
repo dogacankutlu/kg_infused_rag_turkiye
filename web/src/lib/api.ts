@@ -90,7 +90,37 @@ export type AskRequest = {
   domain?: string;
   difficulty?: string;
   reasoning_path?: string[];
-  pipeline?: "kg_infused" | "vanilla";
+  pipeline?: "kg_infused" | "vanilla" | "vanilla_qe" | "no_retrieval";
+};
+
+// Matches the actual /api/verify payload (lightweight previews — not full
+// SeedTrace / RetrievedPassage objects).
+export type VerifyCheck = {
+  id: string;
+  label: string;
+  ok: boolean;
+  detail: string;
+};
+
+export type VerifySeed = {
+  entity_id: string;
+  name: string;
+  score: number;
+};
+
+export type VerifyPassage = {
+  entity_id: string;
+  title: string;
+  score: number;
+};
+
+export type VerifyResponse = {
+  question_text: string;
+  answerable: boolean;
+  recommendation: string;
+  checks: VerifyCheck[];
+  seeds: VerifySeed[];
+  passages: VerifyPassage[];
 };
 
 async function jfetch<T>(path: string, init?: RequestInit): Promise<T> {
@@ -135,7 +165,7 @@ export const api = {
   evaluation: () =>
     jfetch<{
       pipelines: {
-        pipeline: "kg_infused" | "vanilla";
+        pipeline: "kg_infused" | "vanilla" | "vanilla_qe" | "no_retrieval";
         runs: number;
         successes?: number;
         success_rate: number;
@@ -149,4 +179,9 @@ export const api = {
         avg_elapsed_seconds: number;
       }[];
     }>("/api/evaluation"),
+  verify: (question_text: string) =>
+    jfetch<VerifyResponse>("/api/verify", {
+      method: "POST",
+      body: JSON.stringify({ question_text }),
+    }),
 };

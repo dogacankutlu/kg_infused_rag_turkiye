@@ -64,6 +64,7 @@ function SiteHeader() {
               tabIndex={0}
               aria-haspopup="menu"
               aria-expanded={open}
+              title="Click to switch pipeline"
               onClick={() => setOpen((o) => !o)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -71,9 +72,25 @@ function SiteHeader() {
                   setOpen((o) => !o);
                 }
               }}
-              className="text-warm-500 cursor-pointer select-none focus:outline-none"
+              className="text-warm-500 cursor-pointer select-none focus:outline-none
+                         inline-flex items-center gap-1"
             >
               {PIPELINE_LABELS[pipeline]}
+              {/* Dropdown affordance — rotates when menu open */}
+              <svg
+                className={`w-3.5 h-3.5 text-warm-400 transition-transform duration-150 ${
+                  open ? "rotate-180" : ""
+                }`}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </span>
             {open && (
               <div
@@ -110,8 +127,8 @@ function SiteHeader() {
             )}
           </span>
         </h1>
-        <p className="text-xs text-neutral-500 mt-0.5">
-          Knowledge Graph · Wikidata5M · Türkiye Domain
+        <p className="text-xs text-warm-500/80 italic mt-0.5">
+          (click the pipeline name to explore other models)
         </p>
       </div>
     </header>

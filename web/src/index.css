@@ -8,12 +8,16 @@
   }
   body {
     min-height: 100%;
-    /* Gradient wash: crisp white at top → soft sunrise-orange at bottom */
+    /* Forced palette: white → yellow → orange → red.
+       Stops chosen so the bulk of the page reads as warm cream-orange,
+       with a faint red glow only in the lowest viewport fold. */
     background: linear-gradient(
       to bottom,
       #ffffff 0%,
-      #fff8ed 30%,
-      #fed7aa 100%
+      #fffbeb 18%,
+      #fde68a 42%,
+      #fdba74 70%,
+      #fb7185 100%
     );
     background-attachment: fixed;
     @apply text-neutral-800 font-sans antialiased;
