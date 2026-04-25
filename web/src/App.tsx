@@ -175,27 +175,44 @@ export function Tabs() {
 }
 
 function Footer() {
+  const stack = [
+    "React + Vite",
+    "FastAPI",
+    "Neo4j",
+    "Ollama / Groq",
+    "Wikidata5M",
+    "Tailwind CSS",
+  ];
   return (
-    <footer className="border-t border-orange-100 bg-white/70 backdrop-blur-sm mt-8">
-      <div className="max-w-6xl mx-auto px-4 py-4 space-y-1">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500">
-          <span className="font-medium text-neutral-600">Stack:</span>
-          <Tech>React + Vite</Tech>
-          <Tech>FastAPI</Tech>
-          <Tech>Neo4j</Tech>
-          <Tech>Ollama / Groq</Tech>
-          <Tech>Wikidata5M</Tech>
-          <Tech>Tailwind CSS</Tech>
+    <footer className="mt-10 border-t border-orange-100/60 bg-white/40 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto px-4 py-5">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          {/* Stack — sleek inline divider list, no boxy chips */}
+          <div className="flex items-center flex-wrap gap-x-1 gap-y-1 text-[11px]">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-warm-500 mr-1">
+              Stack
+            </span>
+            {stack.map((s, i) => (
+              <span key={s} className="flex items-center gap-1">
+                {i > 0 && (
+                  <span className="text-orange-300/80 select-none">·</span>
+                )}
+                <span className="text-neutral-600 font-medium hover:text-warm-700 transition-colors">
+                  {s}
+                </span>
+              </span>
+            ))}
+          </div>
+
+          {/* Credits — right-aligned on desktop */}
+          <p className="text-[11px] text-neutral-500 md:text-right">
+            <span className="font-semibold text-neutral-700">Doğacan Kutlu</span>
+            <span className="text-neutral-400"> · </span>
+            <span className="font-semibold text-neutral-700">Ceren Karadayı</span>
+            <span className="text-neutral-400"> — </span>
+            <span className="text-neutral-600">CSE 474 · 2026</span>
+          </p>
         </div>
-        <p className="text-xs text-neutral-500">
-          Created by{" "}
-          <span className="font-medium text-neutral-700">Doğacan Kutlu</span>,{" "}
-          <span className="font-medium text-neutral-700">Ceren Karadayı</span>{" "}
-          for{" "}
-          <span className="font-medium text-neutral-700">
-            CSE 474 — Social Network Analysis (2026)
-          </span>
-        </p>
       </div>
     </footer>
   );
