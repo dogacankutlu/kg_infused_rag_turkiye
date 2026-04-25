@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { api, type RAGResult } from "../lib/api";
+import { api, type AskRequest, type Question, type RAGResult } from "../lib/api";
 import AnswerBlock from "../components/AnswerBlock";
 import ActivationGraph from "../components/ActivationGraph";
 import KGAnalysisCard from "../components/KGAnalysisCard";
@@ -18,8 +18,9 @@ const PLACEHOLDER_PHRASES = [
   "Mimar Sinan'ın doğduğu il hangisidir?",
 ];
 
-const DIFFICULTY_ORDER = ["2-hop", "3-hop", "comparison"];
+const DIFFICULTY_ORDER = ["single-hop", "2-hop", "3-hop", "comparison"];
 const DIFFICULTY_LABEL: Record<string, string> = {
+  "single-hop": "Single-Hop",
   "2-hop": "2-Hop",
   "3-hop": "3-Hop",
   comparison: "Comparison",
@@ -30,9 +31,23 @@ export default function HomePage() {
   const [pipeline] = usePipeline();
   const animatedPlaceholder = useTypewriter(PLACEHOLDER_PHRASES);
 
+  // Load the QA dataset so submits can carry gold answers / reasoning paths,
+  // which is what makes the metrics (EM/F1/Accuracy/Retrieval Recall) compute.
+  const { data: qaData } = useQuery({
+    queryKey: ["questions-all"],
+    queryFn: () => api.questions(),
+  });
+
+  const lookup = useMemo(() => {
+    const m = new Map<string, Question>();
+    for (const q of qaData?.questions ?? []) {
+      m.set(q.question_text.trim().toLowerCase(), q);
+    }
+    return m;
+  }, [qaData]);
+
   const mutation = useMutation({
-    mutationFn: (q: string) =>
-      api.ask({ question_text: q, pipeline }),
+    mutationFn: (req: AskRequest) => api.ask(req),
   });
 
   const result = mutation.data as RAGResult | undefined;
@@ -42,7 +57,21 @@ export default function HomePage() {
     const trimmed = q.trim();
     if (!trimmed || mutation.isPending) return;
     setQuestion(trimmed);
-    mutation.mutate(trimmed);
+
+    // If the question matches one in the QA dataset, attach gold answer +
+    // metadata so the backend evaluator can score it.
+    const match = lookup.get(trimmed.toLowerCase());
+    const req: AskRequest = match
+      ? {
+          question_text: trimmed,
+          gold_answer: match.gold_answer,
+          domain: match.domain,
+          difficulty: match.difficulty,
+          reasoning_path: match.reasoning_path,
+          pipeline,
+        }
+      : { question_text: trimmed, pipeline };
+    mutation.mutate(req);
   };
 
   return (
@@ -130,9 +159,9 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── Landing: sample questions ── */}
+      {/* ── Landing: sample questions — clicking only populates the input. ── */}
       {!hasResult && !mutation.isPending && (
-        <SampleQuestions onSelect={(q) => submit(q)} />
+        <SampleQuestions onSelect={(q) => setQuestion(q)} />
       )}
 
       {/* ── Results ── */}
@@ -209,11 +238,16 @@ function SampleQuestions({ onSelect }: { onSelect: (q: string) => void }) {
                               <span className="text-neutral-700 group-hover:text-neutral-900">
                                 {q.question_text}
                               </span>
-                              {q.domain && (
-                                <span className="ml-auto shrink-0 chip chip-warm text-[10px]">
-                                  {q.domain}
-                                </span>
-                              )}
+                              <div className="ml-auto flex items-center gap-1 shrink-0">
+                                {q.domain && (
+                                  <span className="chip chip-warm text-[10px]">
+                                    {q.domain}
+                                  </span>
+                                )}
+                                {q.gold_answer && (
+                                  <GoldBadge title={`Gold: ${q.gold_answer}`} />
+                                )}
+                              </div>
                             </div>
                           </button>
                         </li>
@@ -306,5 +340,24 @@ function RetrievedPassagesCard({ result }: { result: RAGResult }) {
         </ol>
       )}
     </div>
+  );
+}
+
+/* ── Gold-answer indicator pill ── */
+function GoldBadge({ title }: { title?: string }) {
+  return (
+    <span
+      title={title}
+      aria-label="Has gold answer"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md
+                 text-[9px] font-bold uppercase tracking-wider
+                 bg-gradient-sunset text-white shadow-peachGlow
+                 border border-burnt-400/40"
+    >
+      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5" fill="currentColor">
+        <path d="M12 2 14.39 8.36 21 9.27l-4.84 4.72L17.51 21 12 17.77 6.49 21l1.36-7.01L3 9.27l6.61-.91L12 2z" />
+      </svg>
+      Gold
+    </span>
   );
 }

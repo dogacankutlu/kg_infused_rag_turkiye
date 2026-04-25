@@ -86,5 +86,43 @@
 
   {"question_id": "TR_076", "question_text": "Tarkan mı yoksa Sezen Aksu mu daha önce doğmuştur?", "reasoning_path": ["Tarkan", "date of birth", "1972", "Sezen Aksu", "date of birth", "1954"], "gold_answer": "Sezen Aksu", "difficulty": "comparison", "domain": "music"},
   {"question_id": "TR_077", "question_text": "Yaşar Kemal mi yoksa Nazım Hikmet mi daha önce doğmuştur?", "reasoning_path": ["Yaşar Kemal", "date of birth", "1923", "Nazım Hikmet", "date of birth", "1902"], "gold_answer": "Nazım Hikmet", "difficulty": "comparison", "domain": "literature"},
-  {"question_id": "TR_078", "question_text": "İstanbul Havalimanı mı yoksa Sabiha Gökçen Havalimanı mı daha sonra açılmıştır?", "reasoning_path": ["İstanbul Havalimanı", "inception", "2018", "Sabiha Gökçen Havalimanı", "inception", "2001"], "gold_answer": "İstanbul Havalimanı", "difficulty": "comparison", "domain": "transportation"}
+  {"question_id": "TR_078", "question_text": "İstanbul Havalimanı mı yoksa Sabiha Gökçen Havalimanı mı daha sonra açılmıştır?", "reasoning_path": ["İstanbul Havalimanı", "inception", "2018", "Sabiha Gökçen Havalimanı", "inception", "2001"], "gold_answer": "İstanbul Havalimanı", "difficulty": "comparison", "domain": "transportation"},
+
+  {"question_id": "TR_079", "question_text": "Türkiye'nin başkenti neresidir?", "reasoning_path": ["Türkiye", "capital", "Ankara"], "gold_answer": "Ankara", "difficulty": "single-hop", "domain": "geography"},
+  {"question_id": "TR_080", "question_text": "Türkiye'nin para birimi nedir?", "reasoning_path": ["Türkiye", "currency", "Türk Lirası"], "gold_answer": "Türk Lirası", "difficulty": "single-hop", "domain": "geography"},
+  {"question_id": "TR_081", "question_text": "Atatürk hangi yılda doğmuştur?", "reasoning_path": ["Mustafa Kemal Atatürk", "date of birth", "1881"], "gold_answer": "1881", "difficulty": "single-hop", "domain": "politics"},
+  {"question_id": "TR_082", "question_text": "Galatasaray hangi yılda kurulmuştur?", "reasoning_path": ["Galatasaray S.K.", "inception", "1905"], "gold_answer": "1905", "difficulty": "single-hop", "domain": "football"},
+  {"question_id": "TR_083", "question_text": "Boğaziçi Üniversitesi hangi şehirdedir?", "reasoning_path": ["Boğaziçi Üniversitesi", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "single-hop", "domain": "academia"},
+  {"question_id": "TR_084", "question_text": "Türkiye'nin resmi dili nedir?", "reasoning_path": ["Türkiye", "official language", "Türkçe"], "gold_answer": "Türkçe", "difficulty": "single-hop", "domain": "geography"},
+  {"question_id": "TR_085", "question_text": "Aziz Sancar hangi alanda Nobel ödülü almıştır?", "reasoning_path": ["Aziz Sancar", "field of work", "Kimya"], "gold_answer": "Kimya", "difficulty": "single-hop", "domain": "science"},
+
+  {"question_id": "TR_086", "question_text": "Orhan Pamuk Nobel ödülünü hangi yıl aldı?", "reasoning_path": ["Orhan Pamuk", "award received", "Nobel Edebiyat Ödülü", "year", "2006"], "gold_answer": "2006", "difficulty": "2-hop", "domain": "literature"},
+  {"question_id": "TR_087", "question_text": "Aziz Sancar Nobel Kimya Ödülü'nü hangi yıl kazandı?", "reasoning_path": ["Aziz Sancar", "award received", "Nobel Kimya Ödülü", "year", "2015"], "gold_answer": "2015", "difficulty": "2-hop", "domain": "science"},
+  {"question_id": "TR_088", "question_text": "Cahit Arf hangi alanda çalışmıştır?", "reasoning_path": ["Cahit Arf", "field of work", "Matematik"], "gold_answer": "Matematik", "difficulty": "single-hop", "domain": "science"},
+  {"question_id": "TR_089", "question_text": "Feza Gürsey hangi şehirde doğmuştur?", "reasoning_path": ["Feza Gürsey", "place of birth", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "single-hop", "domain": "science"},
+
+  {"question_id": "TR_090", "question_text": "Baklava'nın kökeni hangi mutfağa aittir?", "reasoning_path": ["Baklava", "country of origin", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "single-hop", "domain": "cuisine"},
+  {"question_id": "TR_091", "question_text": "Türk kahvesi hangi UNESCO listesine girmiştir?", "reasoning_path": ["Türk kahvesi", "heritage status", "UNESCO Somut Olmayan Kültürel Miras"], "gold_answer": "UNESCO Somut Olmayan Kültürel Miras", "difficulty": "2-hop", "domain": "cuisine"},
+  {"question_id": "TR_092", "question_text": "Lokum hangi ülkenin geleneksel tatlısıdır?", "reasoning_path": ["Lokum", "country of origin", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "single-hop", "domain": "cuisine"},
+  {"question_id": "TR_093", "question_text": "Adana kebabı hangi şehrin adını taşır?", "reasoning_path": ["Adana kebabı", "named after", "Adana"], "gold_answer": "Adana", "difficulty": "single-hop", "domain": "cuisine"},
+
+  {"question_id": "TR_094", "question_text": "Haluk Bilginer hangi şehirde doğmuştur?", "reasoning_path": ["Haluk Bilginer", "place of birth", "İzmir"], "gold_answer": "İzmir", "difficulty": "single-hop", "domain": "theater"},
+  {"question_id": "TR_095", "question_text": "Devlet Tiyatroları'nın kurulduğu şehir neresidir?", "reasoning_path": ["Devlet Tiyatroları", "headquarters location", "Ankara"], "gold_answer": "Ankara", "difficulty": "single-hop", "domain": "theater"},
+  {"question_id": "TR_096", "question_text": "Genco Erkal hangi tiyatroyu kurmuştur?", "reasoning_path": ["Genco Erkal", "founded", "Dostlar Tiyatrosu"], "gold_answer": "Dostlar Tiyatrosu", "difficulty": "single-hop", "domain": "theater"},
+
+  {"question_id": "TR_097", "question_text": "Çanakkale Savaşı hangi yılda başlamıştır?", "reasoning_path": ["Çanakkale Savaşı", "start time", "1915"], "gold_answer": "1915", "difficulty": "single-hop", "domain": "military"},
+  {"question_id": "TR_098", "question_text": "Türk Kurtuluş Savaşı'nın başkomutanı kimdir?", "reasoning_path": ["Türk Kurtuluş Savaşı", "commander", "Mustafa Kemal Atatürk"], "gold_answer": "Mustafa Kemal Atatürk", "difficulty": "single-hop", "domain": "military"},
+  {"question_id": "TR_099", "question_text": "Çanakkale Savaşı hangi cephede yapılmıştır?", "reasoning_path": ["Çanakkale Savaşı", "part of", "I. Dünya Savaşı"], "gold_answer": "I. Dünya Savaşı", "difficulty": "2-hop", "domain": "military"},
+
+  {"question_id": "TR_100", "question_text": "Hürriyet gazetesi hangi şehirde kurulmuştur?", "reasoning_path": ["Hürriyet", "headquarters location", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "single-hop", "domain": "journalism"},
+  {"question_id": "TR_101", "question_text": "Cumhuriyet gazetesinin kurucusu kimdir?", "reasoning_path": ["Cumhuriyet", "founded by", "Yunus Nadi"], "gold_answer": "Yunus Nadi", "difficulty": "single-hop", "domain": "journalism"},
+  {"question_id": "TR_102", "question_text": "Anadolu Ajansı hangi yıl kurulmuştur?", "reasoning_path": ["Anadolu Ajansı", "inception", "1920"], "gold_answer": "1920", "difficulty": "single-hop", "domain": "journalism"},
+
+  {"question_id": "TR_103", "question_text": "Vakko hangi sektörde faaliyet göstermektedir?", "reasoning_path": ["Vakko", "industry", "Tekstil"], "gold_answer": "Tekstil", "difficulty": "single-hop", "domain": "fashion"},
+  {"question_id": "TR_104", "question_text": "Mavi Jeans'in kurucusu kimdir?", "reasoning_path": ["Mavi", "founded by", "Sait Akarlılar"], "gold_answer": "Sait Akarlılar", "difficulty": "single-hop", "domain": "fashion"},
+  {"question_id": "TR_105", "question_text": "Hatice Gönnet hangi alanda çalışmıştır?", "reasoning_path": ["Hatice Gönnet", "field of work", "Hititoloji"], "gold_answer": "Hititoloji", "difficulty": "single-hop", "domain": "science"},
+
+  {"question_id": "TR_106", "question_text": "Ankara mı yoksa İzmir mi nüfus olarak daha büyüktür?", "reasoning_path": ["Ankara", "population", "5747325", "İzmir", "population", "4462056"], "gold_answer": "Ankara", "difficulty": "comparison", "domain": "geography"},
+  {"question_id": "TR_107", "question_text": "Aziz Sancar mı yoksa Orhan Pamuk mu daha önce Nobel kazandı?", "reasoning_path": ["Orhan Pamuk", "award received", "2006", "Aziz Sancar", "award received", "2015"], "gold_answer": "Orhan Pamuk", "difficulty": "comparison", "domain": "science"},
+  {"question_id": "TR_108", "question_text": "Hürriyet mi yoksa Cumhuriyet mi daha önce kurulmuştur?", "reasoning_path": ["Cumhuriyet", "inception", "1924", "Hürriyet", "inception", "1948"], "gold_answer": "Cumhuriyet", "difficulty": "comparison", "domain": "journalism"}
 ]

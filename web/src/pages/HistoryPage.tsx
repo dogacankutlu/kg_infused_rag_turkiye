@@ -139,34 +139,47 @@ function OverviewTab() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div className="card p-4" style={{ height: 260 }}>
+          <div className="card p-4" style={{ height: 320 }}>
             <div className="text-sm font-semibold mb-2">QA domains</div>
-            <ResponsiveContainer width="100%" height="85%">
+            <ResponsiveContainer width="100%" height="88%">
               <PieChart>
                 <Pie
                   data={domainData}
                   dataKey="value"
                   nameKey="name"
-                  outerRadius={80}
-                  label
+                  outerRadius={90}
+                  // Label each slice with the domain name + count.
+                  label={(p: any) => `${p.name} (${p.value})`}
+                  labelLine
+                  isAnimationActive={false}
                 >
                   {domainData.map((_, i) => (
                     <Cell key={i} fill={WARM_COLORS[i % WARM_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value: any, name: any) => [`${value} questions`, name]}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="card p-4" style={{ height: 260 }}>
-            <div className="text-sm font-semibold mb-2">QA difficulty</div>
-            <ResponsiveContainer width="100%" height="85%">
+          <div className="card p-4" style={{ height: 320 }}>
+            <div className="text-sm font-semibold mb-2">Number of Questions</div>
+            <div className="text-[11px] text-neutral-500 mb-1">
+              Question count grouped by difficulty
+            </div>
+            <ResponsiveContainer width="100%" height="82%">
               <BarChart data={difficultyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#fed7aa" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#F97316" radius={[4, 4, 0, 0]} />
+                <Tooltip
+                  formatter={(value: any, _name: any, p: any) => [
+                    `${value} questions`,
+                    p.payload.name,
+                  ]}
+                />
+                <Bar dataKey="value" name="Questions" fill="#F97316" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -270,6 +283,7 @@ function QATab() {
           onChange={(e) => setDifficulty(e.target.value)}
         >
           <option value="">All difficulties</option>
+          <option value="single-hop">single-hop</option>
           <option value="2-hop">2-hop</option>
           <option value="3-hop">3-hop</option>
           <option value="comparison">comparison</option>
@@ -294,7 +308,7 @@ function QATab() {
             </thead>
             <tbody>
               {(() => {
-                const order = ["2-hop", "3-hop", "comparison"];
+                const order = ["single-hop", "2-hop", "3-hop", "comparison"];
                 const groups = new Map<string, typeof data.questions>();
                 for (const q of data.questions) {
                   const key = q.difficulty || "other";
@@ -336,7 +350,10 @@ function QATab() {
                           <span className="chip">{q.domain}</span>
                         </td>
                         <td className="px-4 py-2">
-                          <span className="chip chip-warm">{q.difficulty}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="chip chip-warm">{q.difficulty}</span>
+                            {q.gold_answer && <InlineGoldBadge />}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -674,6 +691,24 @@ function PipelineSuccessCard({
         <span className="font-mono">{elapsed.toFixed(2)}s</span>
       </div>
     </div>
+  );
+}
+
+function InlineGoldBadge() {
+  return (
+    <span
+      title="Has gold answer"
+      aria-label="Has gold answer"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md
+                 text-[9px] font-bold uppercase tracking-wider
+                 bg-gradient-sunset text-white shadow-peachGlow
+                 border border-burnt-400/40"
+    >
+      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5" fill="currentColor">
+        <path d="M12 2 14.39 8.36 21 9.27l-4.84 4.72L17.51 21 12 17.77 6.49 21l1.36-7.01L3 9.27l6.61-.91L12 2z" />
+      </svg>
+      Gold
+    </span>
   );
 }
 

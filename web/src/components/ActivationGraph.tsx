@@ -91,7 +91,7 @@ export default function ActivationGraph({
   ];
 
   return (
-    <div className="card p-5 h-full flex flex-col">
+    <div className="card p-5 flex flex-col">
       <h2 className="font-semibold text-neutral-800 mb-1">Knowledge Path</h2>
       <div className="text-xs text-neutral-500 mb-3">
         Nodes:{" "}
@@ -118,16 +118,31 @@ export default function ActivationGraph({
       )}
 
       {elements.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-sm text-neutral-500 italic">
+        <div className="h-[420px] flex items-center justify-center text-sm text-neutral-500 italic">
           No triples selected during spreading activation.
         </div>
       ) : (
-        <div className="flex-1 min-h-[380px]">
+        // Explicit height so Cytoscape has a measurable container at mount
+        // time. Width auto-fills the column.
+        <div
+          className="w-full rounded-xl border border-orange-100 bg-warm-50/30"
+          style={{ height: 460 }}
+        >
           <CytoscapeComponent
+            key={elements.length}
             elements={elements}
             style={{ width: "100%", height: "100%" }}
             stylesheet={stylesheet}
-            layout={{ name: "cose", animate: false, padding: 30, nodeRepulsion: 9000, idealEdgeLength: 80 } as any}
+            layout={
+              {
+                name: "cose",
+                animate: false,
+                padding: 30,
+                nodeRepulsion: 9000,
+                idealEdgeLength: 80,
+                fit: true,
+              } as any
+            }
           />
         </div>
       )}
