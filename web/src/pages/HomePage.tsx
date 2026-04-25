@@ -242,9 +242,10 @@ function ResultView({ result }: { result: RAGResult }) {
       {isVanilla ? (
         <RetrievedPassagesCard result={result} />
       ) : (
-        <>
-          {/* Row 2: KG Analysis (left) + Knowledge Path graph (right) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+        // Two-column layout — left column: KG Analysis + Knowledge Path,
+        // right column: Pathway + Cypher Queries.
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+          <div className="space-y-5">
             <KGAnalysisCard
               summary={result.activation.summary}
               rounds={result.activation.rounds}
@@ -254,13 +255,11 @@ function ResultView({ result }: { result: RAGResult }) {
               rounds={result.activation.rounds}
             />
           </div>
-
-          {/* Row 3: Pathway (left) + Cypher Queries (right) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+          <div className="space-y-5">
             <PathwayCard subgraph={result.activation.subgraph} />
             <CypherQueriesCard />
           </div>
-        </>
+        </div>
       )}
     </div>
   );

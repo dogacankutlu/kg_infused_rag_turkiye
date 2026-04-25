@@ -30,7 +30,7 @@ from src.kg import Neo4jClient
 from src.kg.seed_finder import SeedFinder
 from src.logging_utils import RunLogger
 from src.rag.passage_retriever import PassageRetriever
-from src.trace import Question
+from src.trace import Question, verdict_from_dict
 
 
 # ---------------------------------------------------------------------------
@@ -300,14 +300,116 @@ def history(
     verdict: Optional[str] = Query(None, description="'success' or 'failure'"),
     limit: int = Query(100, ge=1, le=1000),
 ) -> dict[str, Any]:
+    """Return recent attempts. Verdict is recomputed on the fly using the
+    current logic so that historical entries are reclassified retroactively
+    (e.g. old "no information found" answers now show as Failed)."""
     logger = RunLogger()
     items: list[dict[str, Any]] = []
-    for rec in logger.iter_attempts(verdict=verdict):
+    for rec in logger.iter_attempts():  # ignore on-disk verdict; we recompute
+        rec["verdict"] = verdict_from_dict(rec)
+        if verdict and rec["verdict"] != verdict:
+            continue
         items.append(rec)
-    # newest first
     items.sort(key=lambda r: r.get("finished_at", r.get("started_at", "")), reverse=True)
     items = items[:limit]
     return {"count": len(items), "attempts": items}
+
+
+# ---------------------------------------------------------------------------
+# /api/evaluation — aggregated metrics per pipeline (KG-Infused vs Vanilla)
+# ---------------------------------------------------------------------------
+
+
+def _pipeline_key(name: str) -> str:
+    n = (name or "").lower()
+    if "vanilla" in n:
+        return "vanilla"
+    if "kg" in n:
+        return "kg_infused"
+    return "other"
+
+
+@app.get("/api/evaluation")
+def evaluation() -> dict[str, Any]:
+    """Aggregate metrics per pipeline across the success+failure logs."""
+    logger = RunLogger()
+    buckets: dict[str, dict[str, Any]] = {}
+
+    for rec in logger.iter_attempts():
+        key = _pipeline_key(rec.get("pipeline", ""))
+        if key == "other":
+            continue
+        v = verdict_from_dict(rec)
+        b = buckets.setdefault(
+            key,
+            {
+                "pipeline": key,
+                "runs": 0,
+                "successes": 0,
+                "with_gold": 0,
+                "em_sum": 0.0,
+                "f1_sum": 0.0,
+                "acc_sum": 0.0,
+                "rr_sum": 0.0,
+                "elapsed_sum": 0.0,
+                "elapsed_n": 0,
+            },
+        )
+        b["runs"] += 1
+        if v == "success":
+            b["successes"] += 1
+
+        # Metrics are only meaningful when a gold answer existed.
+        gold = (rec.get("question") or {}).get("gold_answer", "")
+        m = rec.get("metrics") or {}
+        if gold:
+            b["with_gold"] += 1
+            b["em_sum"] += float(m.get("em") or 0.0)
+            b["f1_sum"] += float(m.get("f1") or 0.0)
+            b["acc_sum"] += float(m.get("accuracy") or 0.0)
+            b["rr_sum"] += float(m.get("retrieval_recall") or 0.0)
+
+        elapsed = rec.get("elapsed_seconds")
+        if elapsed:
+            b["elapsed_sum"] += float(elapsed)
+            b["elapsed_n"] += 1
+
+    def avg(s: float, n: int) -> float:
+        return round(s / n, 4) if n else 0.0
+
+    pipelines: list[dict[str, Any]] = []
+    for key in ("kg_infused", "vanilla"):
+        b = buckets.get(key)
+        if not b:
+            pipelines.append(
+                {
+                    "pipeline": key,
+                    "runs": 0,
+                    "success_rate": 0.0,
+                    "with_gold": 0,
+                    "metrics": {"em": 0.0, "f1": 0.0, "accuracy": 0.0, "retrieval_recall": 0.0},
+                    "avg_elapsed_seconds": 0.0,
+                }
+            )
+            continue
+        n_gold = b["with_gold"]
+        pipelines.append(
+            {
+                "pipeline": key,
+                "runs": b["runs"],
+                "successes": b["successes"],
+                "success_rate": round(b["successes"] / b["runs"], 4) if b["runs"] else 0.0,
+                "with_gold": n_gold,
+                "metrics": {
+                    "em": avg(b["em_sum"], n_gold),
+                    "f1": avg(b["f1_sum"], n_gold),
+                    "accuracy": avg(b["acc_sum"], n_gold),
+                    "retrieval_recall": avg(b["rr_sum"], n_gold),
+                },
+                "avg_elapsed_seconds": avg(b["elapsed_sum"], b["elapsed_n"]),
+            }
+        )
+    return {"pipelines": pipelines}
 
 
 # ---------------------------------------------------------------------------

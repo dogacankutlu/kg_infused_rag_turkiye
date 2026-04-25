@@ -132,4 +132,21 @@ export const api = {
       avg_elapsed_seconds: number;
       runs_analyzed: number;
     }>("/api/queries"),
+  evaluation: () =>
+    jfetch<{
+      pipelines: {
+        pipeline: "kg_infused" | "vanilla";
+        runs: number;
+        successes?: number;
+        success_rate: number;
+        with_gold: number;
+        metrics: {
+          em: number;
+          f1: number;
+          accuracy: number;
+          retrieval_recall: number;
+        };
+        avg_elapsed_seconds: number;
+      }[];
+    }>("/api/evaluation"),
 };

@@ -1,8 +1,72 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any
+
+
+# Patterns that indicate the model did not produce a real answer. Matched on
+# the lowercased, punctuation-light answer string. Both Turkish and English
+# variants since the pipeline answers in either language depending on prompt.
+_NO_INFO_PATTERNS = [
+    "bilgi bulunmamaktadır",
+    "bilgi bulunamadı",
+    "bilgi bulunamamıştır",
+    "bilinmiyor",
+    "bilinmemektedir",
+    "veri yok",
+    "yanıt verilemiyor",
+    "cevap verilemiyor",
+    "ilgili pasaj bulunamadı",
+    "bulunamadı",
+    "no information",
+    "no answer",
+    "not found",
+    "not available",
+    "unknown",
+    "i don't know",
+    "i do not know",
+    "n/a",
+    "none",
+    "null",
+]
+
+
+def is_no_info_answer(answer: str) -> bool:
+    """Return True if the answer string represents a 'no information' result."""
+    if not answer:
+        return True
+    norm = re.sub(r"[\.\!\?\"'\-—]+$", "", answer.strip().lower()).strip()
+    if not norm or norm in {"—", "-", "?"}:
+        return True
+    # Exact phrase or starts-with check (covers "Bilgi bulunmamaktadır.",
+    # "No information found in the passages.", etc.).
+    for pat in _NO_INFO_PATTERNS:
+        if pat in norm:
+            return True
+    return False
+
+
+def verdict_from_dict(rec: dict[str, Any]) -> str:
+    """Recompute the success/failure verdict from a serialized RAGResult dict.
+
+    Used by the API to migrate verdicts in old log records on the fly so that
+    logic changes (e.g. recognizing 'no information' as a failure) propagate
+    retroactively without rewriting history files.
+    """
+    if rec.get("error"):
+        return "failure"
+    q = rec.get("question") or {}
+    metrics = rec.get("metrics") or {}
+    if q.get("gold_answer"):
+        em = float(metrics.get("em") or 0.0)
+        f1 = float(metrics.get("f1") or 0.0)
+        return "success" if (em >= 1.0 or f1 >= 0.5) else "failure"
+    ans = (rec.get("answer") or "").strip()
+    if not ans or is_no_info_answer(ans):
+        return "failure"
+    return "success"
 
 
 @dataclass
@@ -162,9 +226,14 @@ class RAGResult:
             if self.metrics and (self.metrics.em >= 1.0 or self.metrics.f1 >= 0.5):
                 return "success"
             return "failure"
-        # 3. no gold answer → any non-empty answer counts as success,
-        #    empty answer counts as failure
-        return "success" if (self.answer or "").strip() else "failure"
+        # 3. no gold answer → non-empty answer counts as success UNLESS the
+        #    answer is a "no information / unknown" response.
+        ans = (self.answer or "").strip()
+        if not ans:
+            return "failure"
+        if is_no_info_answer(ans):
+            return "failure"
+        return "success"
 
     def to_dict(self) -> dict[str, Any]:
         return {
