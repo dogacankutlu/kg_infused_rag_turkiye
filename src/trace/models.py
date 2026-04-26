@@ -48,13 +48,25 @@ def is_no_info_answer(answer: str) -> bool:
     return False
 
 
-def verdict_from_dict(rec: dict[str, Any]) -> str:
-    """Recompute the success/failure verdict from a serialized RAGResult dict.
+VERDICTS = ("success", "failure", "unverified")
 
-    Used by the API to migrate verdicts in old log records on the fly so that
-    logic changes (e.g. recognizing 'no information' as a failure) propagate
-    retroactively without rewriting history files.
+
+def verdict_from_dict(rec: dict[str, Any]) -> str:
+    """Recompute the success/failure/unverified verdict from a serialized
+    RAGResult dict. Manual overrides (rec['manual_verdict']) win.
+
+    Verdict ladder:
+      1. manual_verdict if present (user override)
+      2. failure if there was an exception
+      3. with gold_answer: success when EM=1 or F1>=0.5, else failure
+      4. without gold_answer: failure if answer is empty / "no information",
+         otherwise UNVERIFIED — the model returned an answer but we have no
+         ground truth to compare against, so the run is neither pass nor fail
+         until a human marks it.
     """
+    manual = (rec.get("manual_verdict") or "").strip().lower()
+    if manual in VERDICTS:
+        return manual
     if rec.get("error"):
         return "failure"
     q = rec.get("question") or {}
@@ -66,7 +78,7 @@ def verdict_from_dict(rec: dict[str, Any]) -> str:
     ans = (rec.get("answer") or "").strip()
     if not ans or is_no_info_answer(ans):
         return "failure"
-    return "success"
+    return "unverified"
 
 
 @dataclass

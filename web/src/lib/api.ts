@@ -68,6 +68,8 @@ export type Question = {
   domain: string;
 };
 
+export type Verdict = "success" | "failure" | "unverified";
+
 export type RAGResult = {
   pipeline: string;
   question: Question;
@@ -81,7 +83,10 @@ export type RAGResult = {
   finished_at: string;
   elapsed_seconds: number;
   error: string;
-  verdict: "success" | "failure";
+  verdict: Verdict;
+  // Stable identifier for manual-verdict overrides (added by /api/history).
+  run_id?: string;
+  manual_verdict?: Verdict | "";
 };
 
 export type AskRequest = {
@@ -167,7 +172,9 @@ export const api = {
       pipelines: {
         pipeline: "kg_infused" | "vanilla" | "vanilla_qe" | "no_retrieval";
         runs: number;
-        successes?: number;
+        successes: number;
+        failures: number;
+        unverified: number;
         success_rate: number;
         with_gold: number;
         metrics: {
@@ -183,5 +190,24 @@ export const api = {
     jfetch<VerifyResponse>("/api/verify", {
       method: "POST",
       body: JSON.stringify({ question_text }),
+    }),
+  setVerdict: (run_id: string, verdict: Verdict | "auto") =>
+    jfetch<{ run_id: string; verdict: string }>("/api/runs/verdict", {
+      method: "POST",
+      body: JSON.stringify({ run_id, verdict }),
+    }),
+  promoteQuestion: (body: {
+    question_text: string;
+    gold_answer: string;
+    domain?: string;
+    difficulty?: string;
+  }) =>
+    jfetch<{
+      created: boolean;
+      question: Question;
+      rescored_runs: number;
+    }>("/api/questions/promote", {
+      method: "POST",
+      body: JSON.stringify(body),
     }),
 };

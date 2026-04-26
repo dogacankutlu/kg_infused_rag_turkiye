@@ -14,6 +14,7 @@ loads embeddings + Neo4j driver + BM25 corpus).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from threading import Lock
@@ -31,6 +32,39 @@ from src.kg.seed_finder import SeedFinder
 from src.logging_utils import RunLogger
 from src.rag.passage_retriever import PassageRetriever
 from src.trace import Question, verdict_from_dict
+
+
+# ---------------------------------------------------------------------------
+# Manual verdict override store
+# ---------------------------------------------------------------------------
+# A run is identified by a 12-char SHA-1 of (started_at + question_text).
+# Overrides live in logs/verdict_overrides.json so they survive restarts and
+# don't require rewriting the original JSONL log files.
+
+_overrides_lock = Lock()
+_overrides_path = Path("logs") / "verdict_overrides.json"
+
+
+def _run_id(rec: dict[str, Any]) -> str:
+    started = rec.get("started_at") or ""
+    qtext = ((rec.get("question") or {}).get("question_text")) or ""
+    digest = hashlib.sha1(f"{started}|{qtext}".encode("utf-8")).hexdigest()
+    return digest[:12]
+
+
+def _read_overrides() -> dict[str, str]:
+    if not _overrides_path.exists():
+        return {}
+    try:
+        return json.loads(_overrides_path.read_text(encoding="utf-8")) or {}
+    except Exception:
+        return {}
+
+
+def _write_overrides(data: dict[str, str]) -> None:
+    with _overrides_lock:
+        _overrides_path.parent.mkdir(parents=True, exist_ok=True)
+        _overrides_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -324,20 +358,163 @@ def domains() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# /api/questions/promote — promote a verified question into the QA dataset
+# ---------------------------------------------------------------------------
+
+class PromoteRequest(BaseModel):
+    question_text: str
+    gold_answer: str
+    domain: Optional[str] = None
+    difficulty: Optional[str] = None
+
+
+_promote_lock = Lock()
+
+
+def _next_user_id(qs: list[dict[str, Any]]) -> str:
+    n = sum(1 for q in qs if str(q.get("question_id", "")).startswith("USR_"))
+    return f"USR_{n + 1:03d}"
+
+
+@app.post("/api/questions/promote")
+def promote_question(req: PromoteRequest) -> dict[str, Any]:
+    """Append a user-verified question to the QA dataset under the
+    'user-created' domain. If a previously logged run targeted the exact
+    same question text, retroactively re-score it against the new gold
+    answer so the Evaluation tab picks it up immediately.
+    """
+    q_text = (req.question_text or "").strip()
+    gold = (req.gold_answer or "").strip()
+    if not q_text:
+        raise HTTPException(status_code=400, detail="question_text is required")
+    if not gold:
+        raise HTTPException(status_code=400, detail="gold_answer is required")
+
+    path = settings.questions_path
+    with _promote_lock:
+        qs = _load_questions()
+        # If a question with the exact same text already exists, just
+        # update its gold_answer rather than duplicating.
+        existing = next(
+            (q for q in qs if (q.get("question_text") or "").strip().lower()
+             == q_text.lower()),
+            None,
+        )
+        if existing:
+            existing["gold_answer"] = gold
+            if req.domain:
+                existing["domain"] = req.domain.strip() or existing.get("domain", "")
+            if req.difficulty:
+                existing["difficulty"] = req.difficulty.strip() or existing.get("difficulty", "")
+            new_q = existing
+            created = False
+        else:
+            new_q = {
+                "question_id": _next_user_id(qs),
+                "question_text": q_text,
+                "reasoning_path": [],
+                "gold_answer": gold,
+                "difficulty": (req.difficulty or "2-hop").strip(),
+                "domain": (req.domain or "user-created").strip() or "user-created",
+            }
+            qs.append(new_q)
+            created = True
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(qs, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    # Retroactively re-score any prior runs against this question text so the
+    # Evaluation dashboard picks up the new gold answer without a re-run.
+    rescored = _rescore_runs_for_question(q_text, gold)
+
+    return {
+        "created": created,
+        "question": new_q,
+        "rescored_runs": rescored,
+    }
+
+
+def _rescore_runs_for_question(question_text: str, gold: str) -> int:
+    """Walk every JSONL log file, attach the new gold answer to any record
+    whose question_text matches (case-insensitive) and that lacks one, then
+    rewrite the file with refreshed metric scores. Returns the number of
+    records updated.
+    """
+    from src.eval.metrics import (  # local import to avoid cold-start cost
+        accuracy as acc_metric,
+        em as em_metric,
+        f1 as f1_metric,
+    )
+
+    target = question_text.strip().lower()
+    updated = 0
+    for sub in ("success", "failure"):
+        d = Path("logs") / sub
+        if not d.exists():
+            continue
+        for fp in d.glob("*.jsonl"):
+            lines = fp.read_text(encoding="utf-8").splitlines()
+            changed = False
+            new_lines: list[str] = []
+            for line in lines:
+                if not line.strip():
+                    new_lines.append(line)
+                    continue
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    new_lines.append(line)
+                    continue
+                q = rec.get("question") or {}
+                qtxt = (q.get("question_text") or "").strip().lower()
+                if qtxt == target and not (q.get("gold_answer") or "").strip():
+                    q["gold_answer"] = gold
+                    rec["question"] = q
+                    ans = rec.get("answer") or ""
+                    metrics = rec.get("metrics") or {}
+                    metrics["em"] = float(em_metric(ans, gold))
+                    metrics["f1"] = float(f1_metric(ans, gold))
+                    metrics["accuracy"] = float(acc_metric(ans, gold))
+                    # retrieval_recall stays as previously logged — recomputing
+                    # it cleanly requires reconstructing the RAGResult, which
+                    # is overkill for a retroactive rescore.
+                    rec["metrics"] = metrics
+                    changed = True
+                    updated += 1
+                new_lines.append(json.dumps(rec, ensure_ascii=False))
+            if changed:
+                fp.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+    return updated
+
+
+# ---------------------------------------------------------------------------
 # /api/history
 # ---------------------------------------------------------------------------
 
 @app.get("/api/history")
 def history(
-    verdict: Optional[str] = Query(None, description="'success' or 'failure'"),
+    verdict: Optional[str] = Query(
+        None, description="'success', 'failure', or 'unverified'"
+    ),
     limit: int = Query(100, ge=1, le=1000),
 ) -> dict[str, Any]:
     """Return recent attempts. Verdict is recomputed on the fly using the
     current logic so that historical entries are reclassified retroactively
-    (e.g. old "no information found" answers now show as Failed)."""
+    (e.g. old "no information found" answers now show as Failed). Each
+    attempt is tagged with a stable `run_id`, and any manual override
+    persisted under logs/verdict_overrides.json wins over the recomputed
+    verdict.
+    """
     logger = RunLogger()
+    overrides = _read_overrides()
     items: list[dict[str, Any]] = []
-    for rec in logger.iter_attempts():  # ignore on-disk verdict; we recompute
+    for rec in logger.iter_attempts():
+        rid = _run_id(rec)
+        rec["run_id"] = rid
+        if rid in overrides:
+            rec["manual_verdict"] = overrides[rid]
         rec["verdict"] = verdict_from_dict(rec)
         if verdict and rec["verdict"] != verdict:
             continue
@@ -345,6 +522,35 @@ def history(
     items.sort(key=lambda r: r.get("finished_at", r.get("started_at", "")), reverse=True)
     items = items[:limit]
     return {"count": len(items), "attempts": items}
+
+
+# ---------------------------------------------------------------------------
+# /api/runs/verdict — manual override
+# ---------------------------------------------------------------------------
+
+class VerdictOverrideRequest(BaseModel):
+    run_id: str
+    verdict: str  # "success" | "failure" | "unverified" — empty string clears
+
+
+@app.post("/api/runs/verdict")
+def set_verdict(req: VerdictOverrideRequest) -> dict[str, Any]:
+    rid = (req.run_id or "").strip()
+    v = (req.verdict or "").strip().lower()
+    if not rid:
+        raise HTTPException(status_code=400, detail="run_id required")
+    overrides = _read_overrides()
+    if v in ("", "auto"):
+        overrides.pop(rid, None)
+    elif v in ("success", "failure", "unverified"):
+        overrides[rid] = v
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="verdict must be one of: success, failure, unverified, auto",
+        )
+    _write_overrides(overrides)
+    return {"run_id": rid, "verdict": overrides.get(rid, "auto")}
 
 
 # ---------------------------------------------------------------------------
@@ -371,14 +577,35 @@ PIPELINE_KEYS = ("no_retrieval", "vanilla", "vanilla_qe", "kg_infused")
 
 @app.get("/api/evaluation")
 def evaluation() -> dict[str, Any]:
-    """Aggregate metrics per pipeline across the success+failure logs."""
+    """Aggregate metrics per pipeline across the success+failure logs.
+
+    Idempotency: only the FIRST attempt for a given (pipeline, question_id)
+    contributes to the global metrics. Subsequent re-runs of the same question
+    remain visible in /api/history but are ignored here so repeated executions
+    cannot skew Accuracy/F1/EM/Retrieval-Recall.
+    """
     logger = RunLogger()
+    overrides = _read_overrides()
     buckets: dict[str, dict[str, Any]] = {}
 
-    for rec in logger.iter_attempts():
+    # Sort attempts chronologically so "first" means earliest by started_at.
+    all_attempts = list(logger.iter_attempts())
+    all_attempts.sort(key=lambda r: r.get("started_at", "") or "")
+    seen: set[tuple[str, str]] = set()
+
+    for rec in all_attempts:
         key = _pipeline_key(rec.get("pipeline", ""))
         if key == "other":
             continue
+        qid = (rec.get("question") or {}).get("question_id", "")
+        dedup_key = (key, qid)
+        if qid and dedup_key in seen:
+            continue  # later run — logged in history, ignored in metrics
+        if qid:
+            seen.add(dedup_key)
+        rid = _run_id(rec)
+        if rid in overrides:
+            rec["manual_verdict"] = overrides[rid]
         v = verdict_from_dict(rec)
         b = buckets.setdefault(
             key,
@@ -386,6 +613,8 @@ def evaluation() -> dict[str, Any]:
                 "pipeline": key,
                 "runs": 0,
                 "successes": 0,
+                "failures": 0,
+                "unverified": 0,
                 "with_gold": 0,
                 "em_sum": 0.0,
                 "f1_sum": 0.0,
@@ -398,8 +627,13 @@ def evaluation() -> dict[str, Any]:
         b["runs"] += 1
         if v == "success":
             b["successes"] += 1
+        elif v == "failure":
+            b["failures"] += 1
+        else:
+            b["unverified"] += 1
 
-        # Metrics are only meaningful when a gold answer existed.
+        # Metrics are only meaningful when a gold answer existed
+        # (manual overrides do not synthesise EM/F1 numbers).
         gold = (rec.get("question") or {}).get("gold_answer", "")
         m = rec.get("metrics") or {}
         if gold:
@@ -425,6 +659,9 @@ def evaluation() -> dict[str, Any]:
                 {
                     "pipeline": key,
                     "runs": 0,
+                    "successes": 0,
+                    "failures": 0,
+                    "unverified": 0,
                     "success_rate": 0.0,
                     "with_gold": 0,
                     "metrics": {"em": 0.0, "f1": 0.0, "accuracy": 0.0, "retrieval_recall": 0.0},
@@ -433,12 +670,17 @@ def evaluation() -> dict[str, Any]:
             )
             continue
         n_gold = b["with_gold"]
+        # Success rate excludes unverified runs from the denominator —
+        # they are pending human review and shouldn't drag the rate down.
+        decided = b["successes"] + b["failures"]
         pipelines.append(
             {
                 "pipeline": key,
                 "runs": b["runs"],
                 "successes": b["successes"],
-                "success_rate": round(b["successes"] / b["runs"], 4) if b["runs"] else 0.0,
+                "failures": b["failures"],
+                "unverified": b["unverified"],
+                "success_rate": round(b["successes"] / decided, 4) if decided else 0.0,
                 "with_gold": n_gold,
                 "metrics": {
                     "em": avg(b["em_sum"], n_gold),

@@ -31,13 +31,28 @@ class Evaluator:
             data = json.load(f)
         return [Question.from_dict(d) for d in data]
 
+    def _previously_seen_qids(self) -> set[str]:
+        """Question IDs already logged for this pipeline — for idempotency,
+        these will be re-run and re-logged but excluded from metric aggregates."""
+        pipeline_name = getattr(self.pipeline, "name", "")
+        seen: set[str] = set()
+        for rec in self.run_logger.iter_attempts():
+            if rec.get("pipeline") != pipeline_name:
+                continue
+            qid = (rec.get("question") or {}).get("question_id", "")
+            if qid:
+                seen.add(qid)
+        return seen
+
     def run(
         self,
         questions: list[Question] | None = None,
         render_each: callable | None = None,
     ) -> dict:
         questions = questions if questions is not None else self.load_questions()
+        already_logged = self._previously_seen_qids()
         results: list[RAGResult] = []
+        counted_results: list[RAGResult] = []
         for q in questions:
             result = self.pipeline.answer(q)
             score_result(result)
@@ -45,9 +60,18 @@ class Evaluator:
             if render_each is not None:
                 render_each(result)
             results.append(result)
-        aggregate, per_group_rows = self._aggregate(results)
+            # Only first execution of a question contributes to metrics.
+            if q.question_id not in already_logged:
+                counted_results.append(result)
+                already_logged.add(q.question_id)
+        aggregate, per_group_rows = self._aggregate(counted_results)
         self._write_csv(results, aggregate, per_group_rows)
-        return {"results": results, "aggregate": aggregate, "groups": per_group_rows}
+        return {
+            "results": results,
+            "counted": counted_results,
+            "aggregate": aggregate,
+            "groups": per_group_rows,
+        }
 
     def _aggregate(self, results: list[RAGResult]):
         def avg(items: list[float]) -> float:

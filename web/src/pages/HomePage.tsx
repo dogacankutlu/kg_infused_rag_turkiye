@@ -4,6 +4,7 @@ import { api, type AskRequest, type Question, type RAGResult } from "../lib/api"
 import AnswerBlock from "../components/AnswerBlock";
 import ActivationGraph from "../components/ActivationGraph";
 import KGAnalysisCard from "../components/KGAnalysisCard";
+import HopTraceCard from "../components/HopTraceCard";
 import PathwayCard from "../components/PathwayCard";
 import CypherQueriesCard from "../components/CypherQueriesCard";
 import { Tabs } from "../App";
@@ -293,10 +294,8 @@ function ResultView({ result }: { result: RAGResult }) {
         // right column: Pathway + Cypher Queries.
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
           <div className="space-y-5">
-            <KGAnalysisCard
-              summary={result.activation.summary}
-              rounds={result.activation.rounds}
-            />
+            <KGAnalysisCard summary={result.activation.summary} />
+            <HopTraceCard rounds={result.activation.rounds} />
             <ActivationGraph
               seeds={result.activation.seeds}
               rounds={result.activation.rounds}
@@ -304,7 +303,7 @@ function ResultView({ result }: { result: RAGResult }) {
           </div>
           <div className="space-y-5">
             <PathwayCard subgraph={result.activation.subgraph} />
-            <CypherQueriesCard />
+            <CypherQueriesCard result={result} />
           </div>
         </div>
       )}

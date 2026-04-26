@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bar,
   BarChart,
@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { api, type VerifyResponse } from "../lib/api";
+import { api, type Verdict, type VerifyResponse } from "../lib/api";
 import {
   labelFor,
   pipelineKey,
@@ -42,6 +42,8 @@ function failureReason(r: {
   answer?: string;
   verdict?: string;
 }): string {
+  // Only show the failure-reason chip for actual failures. Unverified
+  // and successful runs never get a reason tag.
   if (r.verdict !== "failure") return "";
   const err = (r.error || "").toLowerCase();
   if (err) {
@@ -427,9 +429,21 @@ function QATab() {
 
 function RunsTab() {
   const [verdict, setVerdict] = useState<string>("");
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ["history", verdict],
     queryFn: () => api.history(verdict || undefined, 100),
+  });
+
+  // Manual verdict override — persists server-side and immediately
+  // invalidates Evaluation tab so success rate / metrics recompute.
+  const setVerdictMut = useMutation({
+    mutationFn: ({ run_id, v }: { run_id: string; v: Verdict | "auto" }) =>
+      api.setVerdict(run_id, v),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["evaluation"] });
+    },
   });
 
   return (
@@ -438,6 +452,7 @@ function RunsTab() {
         {[
           { id: "", label: "All" },
           { id: "success", label: "Successful" },
+          { id: "unverified", label: "Unverified" },
           { id: "failure", label: "Failed" },
         ].map(({ id, label }) => (
           <button
@@ -474,11 +489,11 @@ function RunsTab() {
             </thead>
             <tbody>
               {data.attempts.map((r, i) => {
-                const ok = r.verdict === "success";
                 const reason = failureReason(r);
+                const rid = r.run_id || "";
                 return (
                   <tr
-                    key={i}
+                    key={rid || i}
                     className="border-t border-orange-50 align-top hover:bg-gold-50/30"
                   >
                     <td className="px-4 py-2 text-xs text-neutral-500 whitespace-nowrap">
@@ -509,16 +524,15 @@ function RunsTab() {
                     <td className="px-4 py-2 whitespace-nowrap">
                       {r.elapsed_seconds.toFixed(2)}s
                     </td>
-                    <td className="px-4 py-2">
-                      <span
-                        className={`chip ${
-                          ok
-                            ? "bg-green-50 text-green-700 border-green-200"
-                            : "bg-red-50 text-red-700 border-red-200"
-                        }`}
-                      >
-                        {ok ? "Successful" : "Failed"}
-                      </span>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <VerdictToggle
+                        current={r.verdict}
+                        manual={!!r.manual_verdict}
+                        disabled={!rid || setVerdictMut.isPending}
+                        onSet={(v) =>
+                          rid && setVerdictMut.mutate({ run_id: rid, v })
+                        }
+                      />
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">
                       {reason ? (
@@ -543,6 +557,96 @@ function RunsTab() {
             </div>
           )}
         </div>
+      )}
+    </div>
+  );
+}
+
+/* ────────────────────────── VerdictToggle ────────────────────────── */
+//
+// Three-state interactive status: Successful (✓ green) / Unverified (◌ gray)
+// / Failed (✗ red). Clicking a state sets the manual override; clicking the
+// active state again clears it back to "auto" (recomputed from gold answer).
+
+function VerdictToggle({
+  current,
+  manual,
+  disabled,
+  onSet,
+}: {
+  current: Verdict;
+  manual: boolean;
+  disabled: boolean;
+  onSet: (v: Verdict | "auto") => void;
+}) {
+  const buttons: {
+    v: Verdict;
+    title: string;
+    icon: string;
+    activeCls: string;
+    idleCls: string;
+  }[] = [
+    {
+      v: "success",
+      title: "Mark as Successful",
+      icon: "✓",
+      activeCls: "bg-green-100 text-green-700 border-green-300 ring-1 ring-green-300",
+      idleCls: "text-neutral-300 hover:text-green-600 hover:bg-green-50 border-transparent",
+    },
+    {
+      v: "unverified",
+      title: "Mark as Unverified",
+      icon: "◌",
+      activeCls: "bg-neutral-100 text-neutral-600 border-neutral-300 ring-1 ring-neutral-300",
+      idleCls: "text-neutral-300 hover:text-neutral-600 hover:bg-neutral-100 border-transparent",
+    },
+    {
+      v: "failure",
+      title: "Mark as Failed",
+      icon: "✗",
+      activeCls: "bg-red-100 text-red-700 border-red-300 ring-1 ring-red-300",
+      idleCls: "text-neutral-300 hover:text-red-600 hover:bg-red-50 border-transparent",
+    },
+  ];
+
+  return (
+    <div
+      className="inline-flex items-center gap-0.5 rounded-lg border border-orange-100
+                 bg-white/80 px-0.5 py-0.5"
+      title={
+        manual
+          ? "Manual override active — click the highlighted icon to clear"
+          : "Automatic verdict — click an icon to override"
+      }
+    >
+      {buttons.map(({ v, title, icon, activeCls, idleCls }) => {
+        const active = current === v;
+        return (
+          <button
+            key={v}
+            type="button"
+            disabled={disabled}
+            title={title}
+            aria-pressed={active}
+            onClick={() => onSet(active ? "auto" : v)}
+            className={`w-6 h-6 inline-flex items-center justify-center
+                        rounded-md border text-xs font-bold transition-colors
+                        disabled:cursor-not-allowed disabled:opacity-60 ${
+                          active ? activeCls : idleCls
+                        }`}
+          >
+            {icon}
+          </button>
+        );
+      })}
+      {manual && (
+        <span
+          className="ml-1 text-[9px] font-semibold uppercase tracking-wider
+                     text-warm-600"
+          title="Manual override"
+        >
+          M
+        </span>
       )}
     </div>
   );
@@ -638,6 +742,7 @@ function EvaluationTab() {
                 successRate={p?.success_rate ?? 0}
                 runs={p?.runs ?? 0}
                 successes={p?.successes ?? 0}
+                unverified={p?.unverified ?? 0}
                 elapsed={p?.avg_elapsed_seconds ?? 0}
               />
             );
@@ -741,16 +846,19 @@ function PipelineSuccessCard({
   successRate,
   runs,
   successes,
+  unverified,
   elapsed,
 }: {
   id: PipelineId;
   successRate: number;
   runs: number;
   successes: number;
+  unverified: number;
   elapsed: number;
 }) {
   const tones = PIPELINE_TONES[id];
-  const pct = `${(successRate * 100).toFixed(1)}%`;
+  const decided = runs - unverified;
+  const pct = decided > 0 ? `${(successRate * 100).toFixed(1)}%` : "—";
 
   return (
     <div className={`rounded-2xl border p-5 ${tones.bg}`}>
@@ -765,9 +873,17 @@ function PipelineSuccessCard({
       <div className={`text-4xl font-extrabold ${tones.accent} tracking-tight`}>
         {pct}
       </div>
-      <div className="text-xs text-neutral-600 mt-2">
-        <span className="font-semibold">{successes}</span> / {runs} · avg{" "}
-        <span className="font-mono">{elapsed.toFixed(2)}s</span>
+      <div className="text-xs text-neutral-600 mt-2 space-y-0.5">
+        <div>
+          <span className="font-semibold">{successes}</span> / {decided}{" "}
+          decided · avg <span className="font-mono">{elapsed.toFixed(2)}s</span>
+        </div>
+        {unverified > 0 && (
+          <div className="text-[11px] text-neutral-500">
+            <span className="font-semibold text-warm-700">{unverified}</span>{" "}
+            pending review
+          </div>
+        )}
       </div>
     </div>
   );
@@ -778,6 +894,9 @@ function PipelineSuccessCard({
 function VerifierTab() {
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState<string | null>(null);
+  const [gold, setGold] = useState("");
+  const [promoteMessage, setPromoteMessage] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Defensive query: any error in `api.verify` lands in `error` instead of
   // bubbling as an unhandled promise. We never throw inside render.
@@ -793,9 +912,39 @@ function VerifierTab() {
     retry: false,
   });
 
+  // Promote-to-dataset: if the user supplies a gold answer for an
+  // answerable question, append it to the QA JSON, drop it into the
+  // "user-created" domain, and retroactively rescore any earlier runs.
+  const promoteMut = useMutation({
+    mutationFn: () =>
+      api.promoteQuestion({
+        question_text: (submitted || "").trim(),
+        gold_answer: gold.trim(),
+        domain: "user-created",
+      }),
+    onSuccess: (res) => {
+      setPromoteMessage(
+        res.created
+          ? `Saved as ${res.question.question_id} · ${res.rescored_runs} prior run(s) rescored.`
+          : `Updated existing entry · ${res.rescored_runs} prior run(s) rescored.`
+      );
+      setGold("");
+      // Refresh the QA dataset table, sample list, domain dropdowns,
+      // and the metrics dashboard.
+      queryClient.invalidateQueries({ queryKey: ["questions"] });
+      queryClient.invalidateQueries({ queryKey: ["questions-all"] });
+      queryClient.invalidateQueries({ queryKey: ["domains"] });
+      queryClient.invalidateQueries({ queryKey: ["evaluation"] });
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["stats"] });
+    },
+  });
+
   const onTest = () => {
     const t = text.trim();
     if (!t) return;
+    setPromoteMessage(null);
+    setGold("");
     if (t === submitted) {
       // React Query won't re-run if key is unchanged; force it.
       void refetch();
@@ -978,6 +1127,68 @@ function VerifierTab() {
                   </li>
                 ))}
               </ol>
+            </div>
+          )}
+
+          {/* Promote-to-Dataset — only when the question is answerable.
+              Captures a manual gold answer, appends it to questions/turkiye_qa.json
+              under the "user-created" domain, and retroactively rescores any
+              prior runs that asked the same text. */}
+          {data.answerable && (
+            <div className="rounded-xl border border-green-200 bg-gradient-to-br
+                            from-green-50 to-gold-50/40 px-4 py-4 space-y-3">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-widest
+                                text-green-700 mb-1">
+                  Promote to Dataset
+                </div>
+                <p className="text-xs text-neutral-600">
+                  This question reaches the KG. Provide a gold answer to add it
+                  to the QA dataset under the <b>user-created</b> domain. Any
+                  earlier "Unverified" runs of this question will be re-scored
+                  against the gold automatically.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  className="input flex-1"
+                  placeholder="Enter gold answer…"
+                  value={gold}
+                  onChange={(e) => setGold(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && gold.trim() && !promoteMut.isPending) {
+                      e.preventDefault();
+                      promoteMut.mutate();
+                    }
+                  }}
+                />
+                <button
+                  disabled={!gold.trim() || promoteMut.isPending}
+                  onClick={() => promoteMut.mutate()}
+                  className="px-4 py-2 rounded-xl font-semibold text-white
+                             bg-gradient-to-br from-green-500 to-green-600
+                             hover:from-green-600 hover:to-green-700
+                             disabled:from-neutral-300 disabled:to-neutral-300
+                             disabled:cursor-not-allowed transition-all shadow-sm
+                             whitespace-nowrap"
+                >
+                  {promoteMut.isPending ? "Saving…" : "Save to Dataset"}
+                </button>
+              </div>
+
+              {promoteMessage && (
+                <div className="text-xs text-green-800 bg-green-100/70 border
+                                border-green-200 rounded-lg px-3 py-2">
+                  {promoteMessage}
+                </div>
+              )}
+              {promoteMut.error && (
+                <div className="text-xs text-red-700 bg-red-50 border border-red-200
+                                rounded-lg px-3 py-2">
+                  {(promoteMut.error as Error).message}
+                </div>
+              )}
             </div>
           )}
         </div>

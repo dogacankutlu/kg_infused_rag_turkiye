@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     neo4j_password: str = "changeme"
     neo4j_database: str = "neo4j"
 
-    llm_provider: str = "groq"
-    llm_model: str = "llama-3.3-70b-versatile"
+    llm_provider: str = "ollama"
+    llm_model: str = "qwen2.5:7b-instruct"
     llm_temperature: float = 0.0
     llm_max_tokens: int = 1024
 
