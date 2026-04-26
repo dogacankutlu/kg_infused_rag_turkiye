@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import HomePage from "./pages/HomePage";
 import HistoryPage from "./pages/HistoryPage";
 import { api } from "./lib/api";
@@ -95,7 +95,7 @@ function SiteHeader() {
             {open && (
               <div
                 role="menu"
-                className="absolute left-0 top-full mt-2 z-[100] min-w-[14rem]
+                className="absolute left-0 top-full mt-2 z-[100] min-w-[16rem]
                            bg-white border border-orange-200 rounded-xl shadow-xl
                            overflow-hidden text-sm"
               >
@@ -123,6 +123,11 @@ function SiteHeader() {
                     </button>
                   );
                 })}
+
+                {/* LLM provider quick-select — applied server-side without
+                    a restart. Clears the pipeline cache so the next /api/ask
+                    call rebuilds against the new provider. */}
+                <ProviderSwitcher />
               </div>
             )}
           </span>
@@ -132,6 +137,81 @@ function SiteHeader() {
         </p>
       </div>
     </header>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * ProviderSwitcher — Groq ↔ Qwen toggle inside the pipeline dropdown.
+ * Hot-swaps the LLM on the backend (POST /api/provider) without restart.
+ * ────────────────────────────────────────────────────────────────────── */
+
+function ProviderSwitcher() {
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["provider"],
+    queryFn: api.getProvider,
+  });
+  const mut = useMutation({
+    mutationFn: (provider: string) => api.setProvider(provider),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["provider"] });
+    },
+  });
+
+  const options = data?.options ?? [
+    { id: "groq", label: "Groq (Cloud)" },
+    { id: "ollama", label: "Qwen (Local · Ollama)" },
+  ];
+  const active = data?.provider ?? "groq";
+
+  return (
+    <div className="border-t border-orange-100">
+      <div className="px-3 pt-2 pb-1 text-[10px] uppercase tracking-widest
+                      text-neutral-400 bg-gold-50/40 flex items-center justify-between">
+        <span>LLM provider</span>
+        {data?.model && (
+          <span
+            className="font-mono text-[9px] text-neutral-400 normal-case tracking-normal truncate max-w-[8rem]"
+            title={data.model}
+          >
+            {data.model}
+          </span>
+        )}
+      </div>
+      <div className="px-2 py-2 bg-gold-50/40">
+        <div className="flex rounded-lg border border-orange-200 overflow-hidden">
+          {options.map((opt) => {
+            const isActive = opt.id === active;
+            return (
+              <button
+                key={opt.id}
+                disabled={isLoading || mut.isPending || isActive}
+                onClick={() => mut.mutate(opt.id)}
+                className={`flex-1 text-xs px-2 py-1.5 font-semibold transition-colors
+                  ${isActive
+                    ? "bg-warm-500 text-white"
+                    : "bg-white text-neutral-700 hover:bg-orange-50 disabled:opacity-50"}`}
+                title={
+                  isActive ? `Currently using ${opt.label}` : `Switch to ${opt.label}`
+                }
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        {mut.isPending && (
+          <div className="text-[10px] text-warm-600 mt-1.5 animate-pulse">
+            Swapping provider…
+          </div>
+        )}
+        {mut.error && (
+          <div className="text-[10px] text-red-600 mt-1.5">
+            {(mut.error as Error).message}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

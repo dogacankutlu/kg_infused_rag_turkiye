@@ -137,6 +137,22 @@ python -m src.cli stats
 
 ## Usage
 
+### One-shot launcher (web UI)
+
+```bash
+./start.sh                  # foreground; Ctrl-C tears down both servers
+./start.sh --open           # also open http://localhost:5173 once Vite is up
+./start.sh --no-tail        # detach into background
+```
+
+On macOS, `start.command` is a double-clickable wrapper around `start.sh --open`
+(Finder runs `.command` files in Terminal). Make it the desktop icon and the
+whole stack — backend, frontend, browser tab — comes up with one click. You
+still need to start Neo4j Desktop yourself; the script warns if `:7687` is
+not listening.
+
+### CLI
+
 ```bash
 # Single question (CLI)
 python -m src.cli ask "Galatasaray'ın teknik direktörünün doğum yeri neresidir?" \
@@ -166,6 +182,11 @@ LLM_PROVIDER=ollama LLM_MODEL=llama3.1 python -m src.cli ask "..."
 ```
 
 No code changes required — every LLM call goes through `src/llm/factory.py`.
+
+The web UI exposes the same swap as a one-click toggle (Groq ↔ Qwen) inside
+the pipeline dropdown — `POST /api/provider` clears the cached LLM client and
+all pipeline instances so the next `/api/ask` call rebuilds against the new
+provider with no server restart.
 
 ## What the console prints for each question
 

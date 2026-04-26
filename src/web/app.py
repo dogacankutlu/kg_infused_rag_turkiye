@@ -113,6 +113,23 @@ def _ensure_llm():
     return _shared["llm"]
 
 
+# Hot-swap support — clear cached LLM + every constructed pipeline so the next
+# /api/ask rebuilds them against the new provider. Cheaper than a full server
+# restart: Neo4j driver, BM25 corpus and embeddings stay loaded.
+def _reset_llm_and_pipelines() -> None:
+    with _pipeline_lock:
+        _shared.pop("llm", None)
+        _pipelines.clear()
+
+
+# Friendly labels for the two providers the UI exposes. "Qwen" is the Ollama
+# default model (qwen2.5:7b-instruct) — the underlying provider is "ollama".
+PROVIDER_LABELS = {
+    "groq": "Groq (Cloud)",
+    "ollama": "Qwen (Local · Ollama)",
+}
+
+
 def _ensure_retriever():
     if "retriever" not in _shared:
         _shared["retriever"] = PassageRetriever()
@@ -247,6 +264,57 @@ app.add_middleware(
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
+# /api/provider — quick-select between Groq and Qwen (Ollama) without restart
+# ---------------------------------------------------------------------------
+
+class ProviderRequest(BaseModel):
+    provider: str  # "groq" | "ollama"
+
+
+@app.get("/api/provider")
+def get_provider() -> dict[str, Any]:
+    """Report the currently active LLM provider and the catalog of options."""
+    current = (settings.llm_provider or "groq").lower()
+    return {
+        "provider": current,
+        "model": settings.llm_model,
+        "label": PROVIDER_LABELS.get(current, current),
+        "options": [
+            {"id": pid, "label": label} for pid, label in PROVIDER_LABELS.items()
+        ],
+    }
+
+
+@app.post("/api/provider")
+def set_provider(req: ProviderRequest) -> dict[str, Any]:
+    """Hot-swap the LLM provider. Mutates settings in place and clears the
+    cached LLM client + every pipeline so the next /api/ask rebuilds against
+    the new provider. No server restart required.
+    """
+    pid = (req.provider or "").strip().lower()
+    if pid not in PROVIDER_LABELS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"provider must be one of: {', '.join(PROVIDER_LABELS.keys())}",
+        )
+    # Pick a sensible default model when flipping providers — Groq needs a
+    # cloud model id; Ollama needs a locally-pulled tag.
+    settings.llm_provider = pid
+    if pid == "groq":
+        if "qwen" in settings.llm_model.lower() or ":" in settings.llm_model:
+            settings.llm_model = "llama-3.3-70b-versatile"
+    elif pid == "ollama":
+        if "llama-" in settings.llm_model.lower() and ":" not in settings.llm_model:
+            settings.llm_model = "qwen2.5:7b-instruct"
+    _reset_llm_and_pipelines()
+    return {
+        "provider": settings.llm_provider,
+        "model": settings.llm_model,
+        "label": PROVIDER_LABELS[pid],
+    }
 
 
 # ---------------------------------------------------------------------------

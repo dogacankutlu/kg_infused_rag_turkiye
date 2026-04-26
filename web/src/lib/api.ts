@@ -196,6 +196,18 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ run_id, verdict }),
     }),
+  getProvider: () =>
+    jfetch<{
+      provider: string;
+      model: string;
+      label: string;
+      options: { id: string; label: string }[];
+    }>("/api/provider"),
+  setProvider: (provider: string) =>
+    jfetch<{ provider: string; model: string; label: string }>(
+      "/api/provider",
+      { method: "POST", body: JSON.stringify({ provider }) }
+    ),
   promoteQuestion: (body: {
     question_text: string;
     gold_answer: string;
