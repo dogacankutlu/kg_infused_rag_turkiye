@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import type { RoundTrace, SeedTrace } from "../lib/api";
+import { prettyName, prettyRelation } from "../lib/prettyName";
 
 const ROUND_COLORS = [
   "#EA580C",
@@ -24,16 +25,29 @@ export default function ActivationGraph({
     const edges: { source: string; target: string; label: string; round: number }[] = [];
 
     for (const s of seeds) {
-      nodes.set(s.entity_id, { id: s.entity_id, label: s.name, round: 0 });
+      nodes.set(s.entity_id, { id: s.entity_id, label: prettyName(s.name), round: 0 });
     }
     rounds.forEach((r, i) => {
       const idx = i + 1;
       for (const t of r.selected_triples) {
         if (!nodes.has(t.source_id))
-          nodes.set(t.source_id, { id: t.source_id, label: t.source_name, round: idx });
+          nodes.set(t.source_id, {
+            id: t.source_id,
+            label: prettyName(t.source_name),
+            round: idx,
+          });
         if (!nodes.has(t.target_id))
-          nodes.set(t.target_id, { id: t.target_id, label: t.target_name, round: idx });
-        edges.push({ source: t.source_id, target: t.target_id, label: t.relation, round: idx });
+          nodes.set(t.target_id, {
+            id: t.target_id,
+            label: prettyName(t.target_name),
+            round: idx,
+          });
+        edges.push({
+          source: t.source_id,
+          target: t.target_id,
+          label: prettyRelation(t.relation),
+          round: idx,
+        });
       }
     });
 

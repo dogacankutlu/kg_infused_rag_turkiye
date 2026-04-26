@@ -1,4 +1,5 @@
 import type { RoundTrace } from "../lib/api";
+import { prettyRelation } from "../lib/prettyName";
 
 export default function HopTraceCard({ rounds }: { rounds: RoundTrace[] }) {
   // The hop count is the number of executed expansion rounds. A round that
@@ -46,11 +47,7 @@ function HopCard({ round }: { round: RoundTrace }) {
     ? "selected"
     : "no selection";
   const relations = Array.from(
-    new Set(
-      round.selected_triples.map((t) =>
-        t.relation.toLowerCase().replace(/_/g, " ")
-      )
-    )
+    new Set(round.selected_triples.map((t) => prettyRelation(t.relation)))
   );
   return (
     <div className="border border-orange-100 rounded-xl p-3 bg-gold-50/40">
