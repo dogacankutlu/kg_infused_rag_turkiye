@@ -103,6 +103,14 @@ ANSWER_SYSTEM = (
     "or entity). Do not add explanations or punctuation beyond the answer itself."
 )
 
+NO_RETRIEVAL_SYSTEM = (
+    "You are a knowledgeable assistant specializing in Turkish history, geography, "
+    "culture, sports, politics, and society. Answer factual questions about Türkiye "
+    "from your own knowledge. Give the shortest precise answer (a name, place, date, "
+    "or entity). Do not explain your reasoning. If you do not know, respond: "
+    "'Bilgi bulunmamaktadır'."
+)
+
 
 def answer_prompt(question: str, enhanced_note: str) -> str:
     return (

@@ -1,128 +1,1502 @@
 [
-  {"question_id": "TR_001", "question_text": "Galatasaray'ın menajerinin doğum yeri neresidir?", "reasoning_path": ["Galatasaray S.K.", "head coach", "Okan Buruk", "place of birth", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "football"},
-  {"question_id": "TR_002", "question_text": "Fenerbahçe'nin stadyumunun bulunduğu şehir neresidir?", "reasoning_path": ["Fenerbahçe S.K.", "home venue", "Şükrü Saracoğlu Stadyumu", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "football"},
-  {"question_id": "TR_003", "question_text": "Beşiktaş'ın kurulduğu şehrin ülkesi neresidir?", "reasoning_path": ["Beşiktaş J.K.", "location", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "football"},
-  {"question_id": "TR_004", "question_text": "Trabzonspor'un oynadığı stadyumun bulunduğu şehir neresidir?", "reasoning_path": ["Trabzonspor", "home venue", "Papara Park", "located in", "Trabzon"], "gold_answer": "Trabzon", "difficulty": "2-hop", "domain": "football"},
-  {"question_id": "TR_005", "question_text": "Hakan Şükür'ün oynadığı kulübün kurulduğu şehir neresidir?", "reasoning_path": ["Hakan Şükür", "member of sports team", "Galatasaray S.K.", "location", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "football"},
-  {"question_id": "TR_006", "question_text": "Arda Turan'ın doğduğu şehrin bulunduğu ülke neresidir?", "reasoning_path": ["Arda Turan", "place of birth", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "football"},
-  {"question_id": "TR_007", "question_text": "Kış Uykusu filminin yönetmeninin doğum yeri neresidir?", "reasoning_path": ["Kış Uykusu", "director", "Nuri Bilge Ceylan", "place of birth", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "cinema"},
-  {"question_id": "TR_008", "question_text": "Bir Zamanlar Anadolu'da filminin yönetmeninin uyruğu nedir?", "reasoning_path": ["Bir Zamanlar Anadolu'da", "director", "Nuri Bilge Ceylan", "country of citizenship", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "cinema"},
-  {"question_id": "TR_009", "question_text": "Eşkıya filminin başrol oyuncusunun doğduğu şehir neresidir?", "reasoning_path": ["Eşkıya", "cast member", "Şener Şen", "place of birth", "Adana"], "gold_answer": "Adana", "difficulty": "2-hop", "domain": "cinema"},
-  {"question_id": "TR_010", "question_text": "Uzak filminin yönetmeninin doğum yeri neresidir?", "reasoning_path": ["Uzak", "director", "Nuri Bilge Ceylan", "place of birth", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "cinema"},
-  {"question_id": "TR_011", "question_text": "Yol filminin yönetmeninin uyruğu nedir?", "reasoning_path": ["Yol", "director", "Yılmaz Güney", "country of citizenship", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "cinema"},
-  {"question_id": "TR_012", "question_text": "Türk Hava Yolları'nın merkezinin bulunduğu şehir neresidir?", "reasoning_path": ["Türk Hava Yolları", "headquarters location", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "company"},
-  {"question_id": "TR_013", "question_text": "Koç Holding'in kurucusunun doğum yeri neresidir?", "reasoning_path": ["Koç Holding", "founded by", "Vehbi Koç", "place of birth", "Ankara"], "gold_answer": "Ankara", "difficulty": "2-hop", "domain": "company"},
-  {"question_id": "TR_014", "question_text": "Sabancı Holding'in kurucusunun memleketi neresidir?", "reasoning_path": ["Sabancı Holding", "founded by", "Hacı Ömer Sabancı", "place of birth", "Kayseri"], "gold_answer": "Kayseri", "difficulty": "2-hop", "domain": "company"},
-  {"question_id": "TR_015", "question_text": "Arçelik'in merkezinin bulunduğu şehir neresidir?", "reasoning_path": ["Arçelik", "headquarters location", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "company"},
-  {"question_id": "TR_016", "question_text": "Türkiye İş Bankası'nın merkezinin bulunduğu şehir neresidir?", "reasoning_path": ["Türkiye İş Bankası", "headquarters location", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "company"},
-  {"question_id": "TR_017", "question_text": "Mustafa Kemal Atatürk'ün doğduğu şehrin bulunduğu ülke neresidir?", "reasoning_path": ["Mustafa Kemal Atatürk", "place of birth", "Selanik", "country", "Yunanistan"], "gold_answer": "Yunanistan", "difficulty": "2-hop", "domain": "politics"},
-  {"question_id": "TR_018", "question_text": "Recep Tayyip Erdoğan'ın doğduğu şehrin bulunduğu ülke neresidir?", "reasoning_path": ["Recep Tayyip Erdoğan", "place of birth", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "politics"},
-  {"question_id": "TR_019", "question_text": "Turgut Özal'ın doğduğu şehir hangi ilde bulunur?", "reasoning_path": ["Turgut Özal", "place of birth", "Malatya"], "gold_answer": "Malatya", "difficulty": "2-hop", "domain": "politics"},
-  {"question_id": "TR_020", "question_text": "Süleyman Demirel'in eğitim gördüğü üniversitenin bulunduğu şehir neresidir?", "reasoning_path": ["Süleyman Demirel", "educated at", "İstanbul Teknik Üniversitesi", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "politics"},
-  {"question_id": "TR_021", "question_text": "Ayasofya'nın bulunduğu şehir neresidir?", "reasoning_path": ["Ayasofya", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "heritage"},
-  {"question_id": "TR_022", "question_text": "Topkapı Sarayı'nın bulunduğu şehir hangi ülkededir?", "reasoning_path": ["Topkapı Sarayı", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "heritage"},
-  {"question_id": "TR_023", "question_text": "Pamukkale'nin bulunduğu il hangisidir?", "reasoning_path": ["Pamukkale", "located in", "Denizli"], "gold_answer": "Denizli", "difficulty": "2-hop", "domain": "heritage"},
-  {"question_id": "TR_024", "question_text": "Efes Antik Kenti'nin bulunduğu il hangisidir?", "reasoning_path": ["Efes", "located in", "İzmir"], "gold_answer": "İzmir", "difficulty": "2-hop", "domain": "heritage"},
-  {"question_id": "TR_025", "question_text": "Kapadokya bölgesinin bulunduğu ülke neresidir?", "reasoning_path": ["Kapadokya", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "heritage"},
-  {"question_id": "TR_026", "question_text": "Boğaziçi Üniversitesi'nin bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Boğaziçi Üniversitesi", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "academia"},
-  {"question_id": "TR_027", "question_text": "ODTÜ'nün bulunduğu şehir neresidir?", "reasoning_path": ["Orta Doğu Teknik Üniversitesi", "located in", "Ankara"], "gold_answer": "Ankara", "difficulty": "2-hop", "domain": "academia"},
-  {"question_id": "TR_028", "question_text": "İstanbul Teknik Üniversitesi'nin bulunduğu ülke neresidir?", "reasoning_path": ["İstanbul Teknik Üniversitesi", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "academia"},
-  {"question_id": "TR_029", "question_text": "Aziz Sancar'ın doğduğu şehir hangisidir?", "reasoning_path": ["Aziz Sancar", "place of birth", "Mardin"], "gold_answer": "Mardin", "difficulty": "2-hop", "domain": "academia"},
-  {"question_id": "TR_030", "question_text": "Orhan Pamuk'un eğitim gördüğü üniversitenin bulunduğu şehir neresidir?", "reasoning_path": ["Orhan Pamuk", "educated at", "Boğaziçi Üniversitesi", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "academia"},
-
-  {"question_id": "TR_031", "question_text": "Galatasaray'ın stadyumunun bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Galatasaray S.K.", "home venue", "Rams Park", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "football"},
-  {"question_id": "TR_032", "question_text": "Fenerbahçe'nin teknik direktörünün doğduğu şehrin ülkesi neresidir?", "reasoning_path": ["Fenerbahçe S.K.", "head coach", "José Mourinho", "place of birth", "Setúbal", "country", "Portekiz"], "gold_answer": "Portekiz", "difficulty": "3-hop", "domain": "football"},
-  {"question_id": "TR_033", "question_text": "Beşiktaş'ın stadyumunun bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Beşiktaş J.K.", "home venue", "Tüpraş Stadyumu", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "football"},
-  {"question_id": "TR_034", "question_text": "Eşkıya filminin başrolünün doğduğu şehrin ülkesi neresidir?", "reasoning_path": ["Eşkıya", "cast member", "Şener Şen", "place of birth", "Adana", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "cinema"},
-  {"question_id": "TR_035", "question_text": "Kış Uykusu filminin yönetmeninin doğduğu şehrin ülkesi neresidir?", "reasoning_path": ["Kış Uykusu", "director", "Nuri Bilge Ceylan", "place of birth", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "cinema"},
-  {"question_id": "TR_036", "question_text": "Koç Holding'in kurucusunun doğduğu şehrin ülkesi neresidir?", "reasoning_path": ["Koç Holding", "founded by", "Vehbi Koç", "place of birth", "Ankara", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "company"},
-  {"question_id": "TR_037", "question_text": "Sabancı Holding'in kurucusunun doğduğu şehrin ülkesi neresidir?", "reasoning_path": ["Sabancı Holding", "founded by", "Hacı Ömer Sabancı", "place of birth", "Kayseri", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "company"},
-  {"question_id": "TR_038", "question_text": "Türk Hava Yolları'nın merkezinin bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Türk Hava Yolları", "headquarters location", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "company"},
-  {"question_id": "TR_039", "question_text": "Turgut Özal'ın doğduğu şehrin bulunduğu ülke hangisidir?", "reasoning_path": ["Turgut Özal", "place of birth", "Malatya", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "politics"},
-  {"question_id": "TR_040", "question_text": "Recep Tayyip Erdoğan'ın eğitim gördüğü üniversitenin bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Recep Tayyip Erdoğan", "educated at", "Marmara Üniversitesi", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "politics"},
-  {"question_id": "TR_041", "question_text": "Pamukkale'nin bulunduğu ilin olduğu ülke neresidir?", "reasoning_path": ["Pamukkale", "located in", "Denizli", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "heritage"},
-  {"question_id": "TR_042", "question_text": "Topkapı Sarayı'nın bulunduğu şehrin ülkesi hangisidir?", "reasoning_path": ["Topkapı Sarayı", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "heritage"},
-  {"question_id": "TR_043", "question_text": "ODTÜ'nün bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Orta Doğu Teknik Üniversitesi", "located in", "Ankara", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "academia"},
-  {"question_id": "TR_044", "question_text": "Aziz Sancar'ın doğduğu şehrin bulunduğu ülke neresidir?", "reasoning_path": ["Aziz Sancar", "place of birth", "Mardin", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "academia"},
-  {"question_id": "TR_045", "question_text": "Orhan Pamuk'un eğitim gördüğü üniversitenin bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Orhan Pamuk", "educated at", "Boğaziçi Üniversitesi", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "academia"},
-
-  {"question_id": "TR_046", "question_text": "Galatasaray mı yoksa Fenerbahçe mi daha erken kurulmuştur?", "reasoning_path": ["Galatasaray S.K.", "inception", "1905", "Fenerbahçe S.K.", "inception", "1907"], "gold_answer": "Galatasaray", "difficulty": "comparison", "domain": "football"},
-  {"question_id": "TR_047", "question_text": "Mustafa Kemal Atatürk mü yoksa İsmet İnönü mü daha erken doğmuştur?", "reasoning_path": ["Mustafa Kemal Atatürk", "date of birth", "1881", "İsmet İnönü", "date of birth", "1884"], "gold_answer": "Mustafa Kemal Atatürk", "difficulty": "comparison", "domain": "politics"},
-  {"question_id": "TR_048", "question_text": "Boğaziçi Üniversitesi mi yoksa ODTÜ mü daha önce kurulmuştur?", "reasoning_path": ["Boğaziçi Üniversitesi", "inception", "1863", "Orta Doğu Teknik Üniversitesi", "inception", "1956"], "gold_answer": "Boğaziçi Üniversitesi", "difficulty": "comparison", "domain": "academia"},
-  {"question_id": "TR_049", "question_text": "Koç Holding mi yoksa Sabancı Holding mi daha erken kurulmuştur?", "reasoning_path": ["Koç Holding", "inception", "1926", "Sabancı Holding", "inception", "1967"], "gold_answer": "Koç Holding", "difficulty": "comparison", "domain": "company"},
-  {"question_id": "TR_050", "question_text": "Nuri Bilge Ceylan mı yoksa Yılmaz Güney mi daha önce doğmuştur?", "reasoning_path": ["Nuri Bilge Ceylan", "date of birth", "1959", "Yılmaz Güney", "date of birth", "1937"], "gold_answer": "Yılmaz Güney", "difficulty": "comparison", "domain": "cinema"},
-
-  {"question_id": "TR_051", "question_text": "Tarkan'ın doğduğu şehir hangisidir?", "reasoning_path": ["Tarkan", "place of birth", "Alzey"], "gold_answer": "Alzey", "difficulty": "2-hop", "domain": "music"},
-  {"question_id": "TR_052", "question_text": "Sezen Aksu'nun doğduğu ilçe hangisidir?", "reasoning_path": ["Sezen Aksu", "place of birth", "Sarayköy"], "gold_answer": "Sarayköy", "difficulty": "2-hop", "domain": "music"},
-  {"question_id": "TR_053", "question_text": "Barış Manço'nun doğduğu şehir hangisidir?", "reasoning_path": ["Barış Manço", "place of birth", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "music"},
-  {"question_id": "TR_054", "question_text": "Ajda Pekkan'ın doğduğu şehrin bulunduğu ülke neresidir?", "reasoning_path": ["Ajda Pekkan", "place of birth", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "music"},
-
-  {"question_id": "TR_055", "question_text": "Yaşar Kemal'in doğduğu il hangisidir?", "reasoning_path": ["Yaşar Kemal", "place of birth", "Osmaniye"], "gold_answer": "Osmaniye", "difficulty": "2-hop", "domain": "literature"},
-  {"question_id": "TR_056", "question_text": "Nazım Hikmet'in doğduğu şehir hangisidir?", "reasoning_path": ["Nazım Hikmet", "place of birth", "Selanik"], "gold_answer": "Selanik", "difficulty": "2-hop", "domain": "literature"},
-  {"question_id": "TR_057", "question_text": "Sabahattin Ali'nin doğduğu şehrin bulunduğu ülke neresidir?", "reasoning_path": ["Sabahattin Ali", "place of birth", "Eğridere", "country", "Bulgaristan"], "gold_answer": "Bulgaristan", "difficulty": "3-hop", "domain": "literature"},
-  {"question_id": "TR_058", "question_text": "Elif Şafak'ın doğduğu şehir hangisidir?", "reasoning_path": ["Elif Şafak", "place of birth", "Strazburg"], "gold_answer": "Strazburg", "difficulty": "2-hop", "domain": "literature"},
-
-  {"question_id": "TR_059", "question_text": "Ayasofya'nın bulunduğu şehir hangisidir?", "reasoning_path": ["Ayasofya", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "religion"},
-  {"question_id": "TR_060", "question_text": "Sultan Ahmet Camii'nin bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Sultan Ahmet Camii", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "religion"},
-  {"question_id": "TR_061", "question_text": "Mevlana Müzesi'nin bulunduğu şehir hangisidir?", "reasoning_path": ["Mevlana Müzesi", "located in", "Konya"], "gold_answer": "Konya", "difficulty": "2-hop", "domain": "religion"},
-
-  {"question_id": "TR_062", "question_text": "Anadolu Efes Spor Kulübü'nün bulunduğu şehir hangisidir?", "reasoning_path": ["Anadolu Efes S.K.", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "basketball"},
-  {"question_id": "TR_063", "question_text": "Fenerbahçe Beko'nun ana arenasının bulunduğu şehir hangisidir?", "reasoning_path": ["Fenerbahçe Beko", "home venue", "Ülker Sports Arena", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "3-hop", "domain": "basketball"},
-  {"question_id": "TR_064", "question_text": "Hidayet Türkoğlu'nun doğduğu şehir hangisidir?", "reasoning_path": ["Hidayet Türkoğlu", "place of birth", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "basketball"},
-  {"question_id": "TR_065", "question_text": "Cedi Osman'ın doğduğu şehrin ülkesi neresidir?", "reasoning_path": ["Cedi Osman", "place of birth", "Ohri", "country", "Kuzey Makedonya"], "gold_answer": "Kuzey Makedonya", "difficulty": "3-hop", "domain": "basketball"},
-
-  {"question_id": "TR_066", "question_text": "İstanbul Havalimanı'nın bulunduğu şehir hangisidir?", "reasoning_path": ["İstanbul Havalimanı", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "transportation"},
-  {"question_id": "TR_067", "question_text": "Sabiha Gökçen Havalimanı'nın bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Sabiha Gökçen Havalimanı", "located in", "İstanbul", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "transportation"},
-  {"question_id": "TR_068", "question_text": "Pegasus Hava Yolları'nın merkezinin bulunduğu şehir hangisidir?", "reasoning_path": ["Pegasus Hava Yolları", "headquarters location", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "2-hop", "domain": "transportation"},
-
-  {"question_id": "TR_069", "question_text": "Mimar Sinan'ın doğduğu il hangisidir?", "reasoning_path": ["Mimar Sinan", "place of birth", "Kayseri"], "gold_answer": "Kayseri", "difficulty": "2-hop", "domain": "architecture"},
-  {"question_id": "TR_070", "question_text": "Süleymaniye Camii'nin mimarı kimdir?", "reasoning_path": ["Süleymaniye Camii", "architect", "Mimar Sinan"], "gold_answer": "Mimar Sinan", "difficulty": "2-hop", "domain": "architecture"},
-  {"question_id": "TR_071", "question_text": "Selimiye Camii'nin bulunduğu şehrin ülkesi neresidir?", "reasoning_path": ["Selimiye Camii", "located in", "Edirne", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "architecture"},
-
-  {"question_id": "TR_072", "question_text": "Gaziantep'in bulunduğu coğrafi bölge hangisidir?", "reasoning_path": ["Gaziantep", "located in", "Güneydoğu Anadolu Bölgesi"], "gold_answer": "Güneydoğu Anadolu Bölgesi", "difficulty": "2-hop", "domain": "geography"},
-  {"question_id": "TR_073", "question_text": "Van Gölü'nün bulunduğu il hangisidir?", "reasoning_path": ["Van Gölü", "located in", "Van"], "gold_answer": "Van", "difficulty": "2-hop", "domain": "geography"},
-  {"question_id": "TR_074", "question_text": "Ağrı Dağı'nın bulunduğu ülke neresidir?", "reasoning_path": ["Ağrı Dağı", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "2-hop", "domain": "geography"},
-  {"question_id": "TR_075", "question_text": "Trabzon'un bulunduğu coğrafi bölgenin ülkesi neresidir?", "reasoning_path": ["Trabzon", "located in", "Karadeniz Bölgesi", "country", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "3-hop", "domain": "geography"},
-
-  {"question_id": "TR_076", "question_text": "Tarkan mı yoksa Sezen Aksu mu daha önce doğmuştur?", "reasoning_path": ["Tarkan", "date of birth", "1972", "Sezen Aksu", "date of birth", "1954"], "gold_answer": "Sezen Aksu", "difficulty": "comparison", "domain": "music"},
-  {"question_id": "TR_077", "question_text": "Yaşar Kemal mi yoksa Nazım Hikmet mi daha önce doğmuştur?", "reasoning_path": ["Yaşar Kemal", "date of birth", "1923", "Nazım Hikmet", "date of birth", "1902"], "gold_answer": "Nazım Hikmet", "difficulty": "comparison", "domain": "literature"},
-  {"question_id": "TR_078", "question_text": "İstanbul Havalimanı mı yoksa Sabiha Gökçen Havalimanı mı daha sonra açılmıştır?", "reasoning_path": ["İstanbul Havalimanı", "inception", "2018", "Sabiha Gökçen Havalimanı", "inception", "2001"], "gold_answer": "İstanbul Havalimanı", "difficulty": "comparison", "domain": "transportation"},
-
-  {"question_id": "TR_079", "question_text": "Türkiye'nin başkenti neresidir?", "reasoning_path": ["Türkiye", "capital", "Ankara"], "gold_answer": "Ankara", "difficulty": "single-hop", "domain": "geography"},
-  {"question_id": "TR_080", "question_text": "Türkiye'nin para birimi nedir?", "reasoning_path": ["Türkiye", "currency", "Türk Lirası"], "gold_answer": "Türk Lirası", "difficulty": "single-hop", "domain": "geography"},
-  {"question_id": "TR_081", "question_text": "Atatürk hangi yılda doğmuştur?", "reasoning_path": ["Mustafa Kemal Atatürk", "date of birth", "1881"], "gold_answer": "1881", "difficulty": "single-hop", "domain": "politics"},
-  {"question_id": "TR_082", "question_text": "Galatasaray hangi yılda kurulmuştur?", "reasoning_path": ["Galatasaray S.K.", "inception", "1905"], "gold_answer": "1905", "difficulty": "single-hop", "domain": "football"},
-  {"question_id": "TR_083", "question_text": "Boğaziçi Üniversitesi hangi şehirdedir?", "reasoning_path": ["Boğaziçi Üniversitesi", "located in", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "single-hop", "domain": "academia"},
-  {"question_id": "TR_084", "question_text": "Türkiye'nin resmi dili nedir?", "reasoning_path": ["Türkiye", "official language", "Türkçe"], "gold_answer": "Türkçe", "difficulty": "single-hop", "domain": "geography"},
-  {"question_id": "TR_085", "question_text": "Aziz Sancar hangi alanda Nobel ödülü almıştır?", "reasoning_path": ["Aziz Sancar", "field of work", "Kimya"], "gold_answer": "Kimya", "difficulty": "single-hop", "domain": "science"},
-
-  {"question_id": "TR_086", "question_text": "Orhan Pamuk Nobel ödülünü hangi yıl aldı?", "reasoning_path": ["Orhan Pamuk", "award received", "Nobel Edebiyat Ödülü", "year", "2006"], "gold_answer": "2006", "difficulty": "2-hop", "domain": "literature"},
-  {"question_id": "TR_087", "question_text": "Aziz Sancar Nobel Kimya Ödülü'nü hangi yıl kazandı?", "reasoning_path": ["Aziz Sancar", "award received", "Nobel Kimya Ödülü", "year", "2015"], "gold_answer": "2015", "difficulty": "2-hop", "domain": "science"},
-  {"question_id": "TR_088", "question_text": "Cahit Arf hangi alanda çalışmıştır?", "reasoning_path": ["Cahit Arf", "field of work", "Matematik"], "gold_answer": "Matematik", "difficulty": "single-hop", "domain": "science"},
-  {"question_id": "TR_089", "question_text": "Feza Gürsey hangi şehirde doğmuştur?", "reasoning_path": ["Feza Gürsey", "place of birth", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "single-hop", "domain": "science"},
-
-  {"question_id": "TR_090", "question_text": "Baklava'nın kökeni hangi mutfağa aittir?", "reasoning_path": ["Baklava", "country of origin", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "single-hop", "domain": "cuisine"},
-  {"question_id": "TR_091", "question_text": "Türk kahvesi hangi UNESCO listesine girmiştir?", "reasoning_path": ["Türk kahvesi", "heritage status", "UNESCO Somut Olmayan Kültürel Miras"], "gold_answer": "UNESCO Somut Olmayan Kültürel Miras", "difficulty": "2-hop", "domain": "cuisine"},
-  {"question_id": "TR_092", "question_text": "Lokum hangi ülkenin geleneksel tatlısıdır?", "reasoning_path": ["Lokum", "country of origin", "Türkiye"], "gold_answer": "Türkiye", "difficulty": "single-hop", "domain": "cuisine"},
-  {"question_id": "TR_093", "question_text": "Adana kebabı hangi şehrin adını taşır?", "reasoning_path": ["Adana kebabı", "named after", "Adana"], "gold_answer": "Adana", "difficulty": "single-hop", "domain": "cuisine"},
-
-  {"question_id": "TR_094", "question_text": "Haluk Bilginer hangi şehirde doğmuştur?", "reasoning_path": ["Haluk Bilginer", "place of birth", "İzmir"], "gold_answer": "İzmir", "difficulty": "single-hop", "domain": "theater"},
-  {"question_id": "TR_095", "question_text": "Devlet Tiyatroları'nın kurulduğu şehir neresidir?", "reasoning_path": ["Devlet Tiyatroları", "headquarters location", "Ankara"], "gold_answer": "Ankara", "difficulty": "single-hop", "domain": "theater"},
-  {"question_id": "TR_096", "question_text": "Genco Erkal hangi tiyatroyu kurmuştur?", "reasoning_path": ["Genco Erkal", "founded", "Dostlar Tiyatrosu"], "gold_answer": "Dostlar Tiyatrosu", "difficulty": "single-hop", "domain": "theater"},
-
-  {"question_id": "TR_097", "question_text": "Çanakkale Savaşı hangi yılda başlamıştır?", "reasoning_path": ["Çanakkale Savaşı", "start time", "1915"], "gold_answer": "1915", "difficulty": "single-hop", "domain": "military"},
-  {"question_id": "TR_098", "question_text": "Türk Kurtuluş Savaşı'nın başkomutanı kimdir?", "reasoning_path": ["Türk Kurtuluş Savaşı", "commander", "Mustafa Kemal Atatürk"], "gold_answer": "Mustafa Kemal Atatürk", "difficulty": "single-hop", "domain": "military"},
-  {"question_id": "TR_099", "question_text": "Çanakkale Savaşı hangi cephede yapılmıştır?", "reasoning_path": ["Çanakkale Savaşı", "part of", "I. Dünya Savaşı"], "gold_answer": "I. Dünya Savaşı", "difficulty": "2-hop", "domain": "military"},
-
-  {"question_id": "TR_100", "question_text": "Hürriyet gazetesi hangi şehirde kurulmuştur?", "reasoning_path": ["Hürriyet", "headquarters location", "İstanbul"], "gold_answer": "İstanbul", "difficulty": "single-hop", "domain": "journalism"},
-  {"question_id": "TR_101", "question_text": "Cumhuriyet gazetesinin kurucusu kimdir?", "reasoning_path": ["Cumhuriyet", "founded by", "Yunus Nadi"], "gold_answer": "Yunus Nadi", "difficulty": "single-hop", "domain": "journalism"},
-  {"question_id": "TR_102", "question_text": "Anadolu Ajansı hangi yıl kurulmuştur?", "reasoning_path": ["Anadolu Ajansı", "inception", "1920"], "gold_answer": "1920", "difficulty": "single-hop", "domain": "journalism"},
-
-  {"question_id": "TR_103", "question_text": "Vakko hangi sektörde faaliyet göstermektedir?", "reasoning_path": ["Vakko", "industry", "Tekstil"], "gold_answer": "Tekstil", "difficulty": "single-hop", "domain": "fashion"},
-  {"question_id": "TR_104", "question_text": "Mavi Jeans'in kurucusu kimdir?", "reasoning_path": ["Mavi", "founded by", "Sait Akarlılar"], "gold_answer": "Sait Akarlılar", "difficulty": "single-hop", "domain": "fashion"},
-  {"question_id": "TR_105", "question_text": "Hatice Gönnet hangi alanda çalışmıştır?", "reasoning_path": ["Hatice Gönnet", "field of work", "Hititoloji"], "gold_answer": "Hititoloji", "difficulty": "single-hop", "domain": "science"},
-
-  {"question_id": "TR_106", "question_text": "Ankara mı yoksa İzmir mi nüfus olarak daha büyüktür?", "reasoning_path": ["Ankara", "population", "5747325", "İzmir", "population", "4462056"], "gold_answer": "Ankara", "difficulty": "comparison", "domain": "geography"},
-  {"question_id": "TR_107", "question_text": "Aziz Sancar mı yoksa Orhan Pamuk mu daha önce Nobel kazandı?", "reasoning_path": ["Orhan Pamuk", "award received", "2006", "Aziz Sancar", "award received", "2015"], "gold_answer": "Orhan Pamuk", "difficulty": "comparison", "domain": "science"},
-  {"question_id": "TR_108", "question_text": "Hürriyet mi yoksa Cumhuriyet mi daha önce kurulmuştur?", "reasoning_path": ["Cumhuriyet", "inception", "1924", "Hürriyet", "inception", "1948"], "gold_answer": "Cumhuriyet", "difficulty": "comparison", "domain": "journalism"}
+  {
+    "question_id": "TR_001",
+    "question_text": "Galatasaray'ın menajerinin doğum yeri neresidir?",
+    "reasoning_path": [
+      "Galatasaray S.K.",
+      "head coach",
+      "Okan Buruk",
+      "place of birth",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "TR_002",
+    "question_text": "Fenerbahçe'nin stadyumunun bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Fenerbahçe S.K.",
+      "home venue",
+      "Şükrü Saracoğlu Stadyumu",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "TR_004",
+    "question_text": "Trabzonspor'un oynadığı stadyumun bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Trabzonspor",
+      "home venue",
+      "Papara Park",
+      "located in",
+      "Trabzon"
+    ],
+    "gold_answer": "Trabzon",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "TR_005",
+    "question_text": "Hakan Şükür'ün oynadığı kulübün kurulduğu şehir neresidir?",
+    "reasoning_path": [
+      "Hakan Şükür",
+      "member of sports team",
+      "Galatasaray S.K.",
+      "location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "TR_007",
+    "question_text": "Kış Uykusu filminin yönetmeninin doğum yeri neresidir?",
+    "reasoning_path": [
+      "Kış Uykusu",
+      "director",
+      "Nuri Bilge Ceylan",
+      "place of birth",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "cinema"
+  },
+  {
+    "question_id": "TR_009",
+    "question_text": "Eşkıya filminin başrol oyuncusunun doğduğu şehir neresidir?",
+    "reasoning_path": [
+      "Eşkıya",
+      "cast member",
+      "Şener Şen",
+      "place of birth",
+      "Adana"
+    ],
+    "gold_answer": "Adana",
+    "difficulty": "2-hop",
+    "domain": "cinema"
+  },
+  {
+    "question_id": "TR_010",
+    "question_text": "Uzak filminin yönetmeninin doğum yeri neresidir?",
+    "reasoning_path": [
+      "Uzak",
+      "director",
+      "Nuri Bilge Ceylan",
+      "place of birth",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "cinema"
+  },
+  {
+    "question_id": "TR_012",
+    "question_text": "Türk Hava Yolları'nın merkezinin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Türk Hava Yolları",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "company"
+  },
+  {
+    "question_id": "TR_013",
+    "question_text": "Koç Holding'in kurucusunun doğum yeri neresidir?",
+    "reasoning_path": [
+      "Koç Holding",
+      "founded by",
+      "Vehbi Koç",
+      "place of birth",
+      "Ankara"
+    ],
+    "gold_answer": "Ankara",
+    "difficulty": "2-hop",
+    "domain": "company"
+  },
+  {
+    "question_id": "TR_014",
+    "question_text": "Sabancı Holding'in kurucusunun memleketi neresidir?",
+    "reasoning_path": [
+      "Sabancı Holding",
+      "founded by",
+      "Hacı Ömer Sabancı",
+      "place of birth",
+      "Kayseri"
+    ],
+    "gold_answer": "Kayseri",
+    "difficulty": "2-hop",
+    "domain": "company"
+  },
+  {
+    "question_id": "TR_015",
+    "question_text": "Arçelik'in merkezinin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Arçelik",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "company"
+  },
+  {
+    "question_id": "TR_016",
+    "question_text": "Türkiye İş Bankası'nın merkezinin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Türkiye İş Bankası",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "company"
+  },
+  {
+    "question_id": "TR_017",
+    "question_text": "Mustafa Kemal Atatürk'ün doğduğu şehrin bulunduğu ülke neresidir?",
+    "reasoning_path": [
+      "Mustafa Kemal Atatürk",
+      "place of birth",
+      "Selanik",
+      "country",
+      "Yunanistan"
+    ],
+    "gold_answer": "Yunanistan",
+    "difficulty": "2-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "TR_019",
+    "question_text": "Turgut Özal'ın doğduğu şehir hangi ilde bulunur?",
+    "reasoning_path": [
+      "Turgut Özal",
+      "place of birth",
+      "Malatya"
+    ],
+    "gold_answer": "Malatya",
+    "difficulty": "2-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "TR_020",
+    "question_text": "Süleyman Demirel'in eğitim gördüğü üniversitenin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Süleyman Demirel",
+      "educated at",
+      "İstanbul Teknik Üniversitesi",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "TR_021",
+    "question_text": "Ayasofya'nın bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Ayasofya",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "heritage"
+  },
+  {
+    "question_id": "TR_022",
+    "question_text": "Topkapı Sarayı'nın bulunduğu şehir hangi ülkededir?",
+    "reasoning_path": [
+      "Topkapı Sarayı",
+      "located in",
+      "İstanbul",
+      "country",
+      "Türkiye"
+    ],
+    "gold_answer": "Türkiye",
+    "difficulty": "2-hop",
+    "domain": "heritage"
+  },
+  {
+    "question_id": "TR_023",
+    "question_text": "Pamukkale'nin bulunduğu il hangisidir?",
+    "reasoning_path": [
+      "Pamukkale",
+      "located in",
+      "Denizli"
+    ],
+    "gold_answer": "Denizli",
+    "difficulty": "2-hop",
+    "domain": "heritage"
+  },
+  {
+    "question_id": "TR_024",
+    "question_text": "Efes Antik Kenti'nin bulunduğu il hangisidir?",
+    "reasoning_path": [
+      "Efes",
+      "located in",
+      "İzmir"
+    ],
+    "gold_answer": "İzmir",
+    "difficulty": "2-hop",
+    "domain": "heritage"
+  },
+  {
+    "question_id": "TR_027",
+    "question_text": "ODTÜ'nün bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Orta Doğu Teknik Üniversitesi",
+      "located in",
+      "Ankara"
+    ],
+    "gold_answer": "Ankara",
+    "difficulty": "2-hop",
+    "domain": "academia"
+  },
+  {
+    "question_id": "TR_029",
+    "question_text": "Aziz Sancar'ın doğduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Aziz Sancar",
+      "place of birth",
+      "Mardin"
+    ],
+    "gold_answer": "Mardin",
+    "difficulty": "2-hop",
+    "domain": "academia"
+  },
+  {
+    "question_id": "TR_030",
+    "question_text": "Orhan Pamuk'un eğitim gördüğü üniversitenin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Orhan Pamuk",
+      "educated at",
+      "Boğaziçi Üniversitesi",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "academia"
+  },
+  {
+    "question_id": "TR_032",
+    "question_text": "Fenerbahçe'nin teknik direktörünün doğduğu şehrin ülkesi neresidir?",
+    "reasoning_path": [
+      "Fenerbahçe S.K.",
+      "head coach",
+      "José Mourinho",
+      "place of birth",
+      "Setúbal",
+      "country",
+      "Portekiz"
+    ],
+    "gold_answer": "Portekiz",
+    "difficulty": "3-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "TR_036",
+    "question_text": "Koç Holding'in kurucusunun doğduğu şehrin ülkesi neresidir?",
+    "reasoning_path": [
+      "Koç Holding",
+      "founded by",
+      "Vehbi Koç",
+      "place of birth",
+      "Ankara",
+      "country",
+      "Türkiye"
+    ],
+    "gold_answer": "Türkiye",
+    "difficulty": "3-hop",
+    "domain": "company"
+  },
+  {
+    "question_id": "TR_046",
+    "question_text": "Galatasaray mı yoksa Fenerbahçe mi daha erken kurulmuştur?",
+    "reasoning_path": [
+      "Galatasaray S.K.",
+      "inception",
+      "1905",
+      "Fenerbahçe S.K.",
+      "inception",
+      "1907"
+    ],
+    "gold_answer": "Galatasaray",
+    "difficulty": "comparison",
+    "domain": "football"
+  },
+  {
+    "question_id": "TR_047",
+    "question_text": "Mustafa Kemal Atatürk mü yoksa İsmet İnönü mü daha erken doğmuştur?",
+    "reasoning_path": [
+      "Mustafa Kemal Atatürk",
+      "date of birth",
+      "1881",
+      "İsmet İnönü",
+      "date of birth",
+      "1884"
+    ],
+    "gold_answer": "Mustafa Kemal Atatürk",
+    "difficulty": "comparison",
+    "domain": "politics"
+  },
+  {
+    "question_id": "TR_048",
+    "question_text": "Boğaziçi Üniversitesi mi yoksa ODTÜ mü daha önce kurulmuştur?",
+    "reasoning_path": [
+      "Boğaziçi Üniversitesi",
+      "inception",
+      "1863",
+      "Orta Doğu Teknik Üniversitesi",
+      "inception",
+      "1956"
+    ],
+    "gold_answer": "Boğaziçi Üniversitesi",
+    "difficulty": "comparison",
+    "domain": "academia"
+  },
+  {
+    "question_id": "TR_049",
+    "question_text": "Koç Holding mi yoksa Sabancı Holding mi daha erken kurulmuştur?",
+    "reasoning_path": [
+      "Koç Holding",
+      "inception",
+      "1926",
+      "Sabancı Holding",
+      "inception",
+      "1967"
+    ],
+    "gold_answer": "Koç Holding",
+    "difficulty": "comparison",
+    "domain": "company"
+  },
+  {
+    "question_id": "TR_050",
+    "question_text": "Nuri Bilge Ceylan mı yoksa Yılmaz Güney mi daha önce doğmuştur?",
+    "reasoning_path": [
+      "Nuri Bilge Ceylan",
+      "date of birth",
+      "1959",
+      "Yılmaz Güney",
+      "date of birth",
+      "1937"
+    ],
+    "gold_answer": "Yılmaz Güney",
+    "difficulty": "comparison",
+    "domain": "cinema"
+  },
+  {
+    "question_id": "TR_051",
+    "question_text": "Tarkan'ın doğduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Tarkan",
+      "place of birth",
+      "Alzey"
+    ],
+    "gold_answer": "Alzey",
+    "difficulty": "2-hop",
+    "domain": "music"
+  },
+  {
+    "question_id": "TR_052",
+    "question_text": "Sezen Aksu'nun doğduğu ilçe hangisidir?",
+    "reasoning_path": [
+      "Sezen Aksu",
+      "place of birth",
+      "Sarayköy"
+    ],
+    "gold_answer": "Sarayköy",
+    "difficulty": "2-hop",
+    "domain": "music"
+  },
+  {
+    "question_id": "TR_053",
+    "question_text": "Barış Manço'nun doğduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Barış Manço",
+      "place of birth",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "music"
+  },
+  {
+    "question_id": "TR_055",
+    "question_text": "Yaşar Kemal'in doğduğu il hangisidir?",
+    "reasoning_path": [
+      "Yaşar Kemal",
+      "place of birth",
+      "Osmaniye"
+    ],
+    "gold_answer": "Osmaniye",
+    "difficulty": "2-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "TR_056",
+    "question_text": "Nazım Hikmet'in doğduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Nazım Hikmet",
+      "place of birth",
+      "Selanik"
+    ],
+    "gold_answer": "Selanik",
+    "difficulty": "2-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "TR_057",
+    "question_text": "Sabahattin Ali'nin doğduğu şehrin bulunduğu ülke neresidir?",
+    "reasoning_path": [
+      "Sabahattin Ali",
+      "place of birth",
+      "Eğridere",
+      "country",
+      "Bulgaristan"
+    ],
+    "gold_answer": "Bulgaristan",
+    "difficulty": "3-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "TR_058",
+    "question_text": "Elif Şafak'ın doğduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Elif Şafak",
+      "place of birth",
+      "Strazburg"
+    ],
+    "gold_answer": "Strazburg",
+    "difficulty": "2-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "TR_059",
+    "question_text": "Ayasofya'nın bulunduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Ayasofya",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "religion"
+  },
+  {
+    "question_id": "TR_061",
+    "question_text": "Mevlana Müzesi'nin bulunduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Mevlana Müzesi",
+      "located in",
+      "Konya"
+    ],
+    "gold_answer": "Konya",
+    "difficulty": "2-hop",
+    "domain": "religion"
+  },
+  {
+    "question_id": "TR_062",
+    "question_text": "Anadolu Efes Spor Kulübü'nün bulunduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Anadolu Efes S.K.",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "basketball"
+  },
+  {
+    "question_id": "TR_063",
+    "question_text": "Fenerbahçe Beko'nun ana arenasının bulunduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Fenerbahçe Beko",
+      "home venue",
+      "Ülker Sports Arena",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "3-hop",
+    "domain": "basketball"
+  },
+  {
+    "question_id": "TR_064",
+    "question_text": "Hidayet Türkoğlu'nun doğduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Hidayet Türkoğlu",
+      "place of birth",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "basketball"
+  },
+  {
+    "question_id": "TR_065",
+    "question_text": "Cedi Osman'ın doğduğu şehrin ülkesi neresidir?",
+    "reasoning_path": [
+      "Cedi Osman",
+      "place of birth",
+      "Ohri",
+      "country",
+      "Kuzey Makedonya"
+    ],
+    "gold_answer": "Kuzey Makedonya",
+    "difficulty": "3-hop",
+    "domain": "basketball"
+  },
+  {
+    "question_id": "TR_066",
+    "question_text": "İstanbul Havalimanı'nın bulunduğu şehir hangisidir?",
+    "reasoning_path": [
+      "İstanbul Havalimanı",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "transportation"
+  },
+  {
+    "question_id": "TR_068",
+    "question_text": "Pegasus Hava Yolları'nın merkezinin bulunduğu şehir hangisidir?",
+    "reasoning_path": [
+      "Pegasus Hava Yolları",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "transportation"
+  },
+  {
+    "question_id": "TR_069",
+    "question_text": "Mimar Sinan'ın doğduğu il hangisidir?",
+    "reasoning_path": [
+      "Mimar Sinan",
+      "place of birth",
+      "Kayseri"
+    ],
+    "gold_answer": "Kayseri",
+    "difficulty": "2-hop",
+    "domain": "architecture"
+  },
+  {
+    "question_id": "TR_070",
+    "question_text": "Süleymaniye Camii'nin mimarı kimdir?",
+    "reasoning_path": [
+      "Süleymaniye Camii",
+      "architect",
+      "Mimar Sinan"
+    ],
+    "gold_answer": "Mimar Sinan",
+    "difficulty": "2-hop",
+    "domain": "architecture"
+  },
+  {
+    "question_id": "TR_072",
+    "question_text": "Gaziantep'in bulunduğu coğrafi bölge hangisidir?",
+    "reasoning_path": [
+      "Gaziantep",
+      "located in",
+      "Güneydoğu Anadolu Bölgesi"
+    ],
+    "gold_answer": "Güneydoğu Anadolu Bölgesi",
+    "difficulty": "2-hop",
+    "domain": "geography"
+  },
+  {
+    "question_id": "TR_073",
+    "question_text": "Van Gölü'nün bulunduğu il hangisidir?",
+    "reasoning_path": [
+      "Van Gölü",
+      "located in",
+      "Van"
+    ],
+    "gold_answer": "Van",
+    "difficulty": "2-hop",
+    "domain": "geography"
+  },
+  {
+    "question_id": "TR_076",
+    "question_text": "Tarkan mı yoksa Sezen Aksu mu daha önce doğmuştur?",
+    "reasoning_path": [
+      "Tarkan",
+      "date of birth",
+      "1972",
+      "Sezen Aksu",
+      "date of birth",
+      "1954"
+    ],
+    "gold_answer": "Sezen Aksu",
+    "difficulty": "comparison",
+    "domain": "music"
+  },
+  {
+    "question_id": "TR_077",
+    "question_text": "Yaşar Kemal mi yoksa Nazım Hikmet mi daha önce doğmuştur?",
+    "reasoning_path": [
+      "Yaşar Kemal",
+      "date of birth",
+      "1923",
+      "Nazım Hikmet",
+      "date of birth",
+      "1902"
+    ],
+    "gold_answer": "Nazım Hikmet",
+    "difficulty": "comparison",
+    "domain": "literature"
+  },
+  {
+    "question_id": "TR_078",
+    "question_text": "İstanbul Havalimanı mı yoksa Sabiha Gökçen Havalimanı mı daha sonra açılmıştır?",
+    "reasoning_path": [
+      "İstanbul Havalimanı",
+      "inception",
+      "2018",
+      "Sabiha Gökçen Havalimanı",
+      "inception",
+      "2001"
+    ],
+    "gold_answer": "İstanbul Havalimanı",
+    "difficulty": "comparison",
+    "domain": "transportation"
+  },
+  {
+    "question_id": "TR_079",
+    "question_text": "Türkiye'nin başkenti neresidir?",
+    "reasoning_path": [
+      "Türkiye",
+      "capital",
+      "Ankara"
+    ],
+    "gold_answer": "Ankara",
+    "difficulty": "single-hop",
+    "domain": "geography"
+  },
+  {
+    "question_id": "TR_080",
+    "question_text": "Türkiye'nin para birimi nedir?",
+    "reasoning_path": [
+      "Türkiye",
+      "currency",
+      "Türk Lirası"
+    ],
+    "gold_answer": "Türk Lirası",
+    "difficulty": "single-hop",
+    "domain": "geography"
+  },
+  {
+    "question_id": "TR_081",
+    "question_text": "Atatürk hangi yılda doğmuştur?",
+    "reasoning_path": [
+      "Mustafa Kemal Atatürk",
+      "date of birth",
+      "1881"
+    ],
+    "gold_answer": "1881",
+    "difficulty": "single-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "TR_082",
+    "question_text": "Galatasaray hangi yılda kurulmuştur?",
+    "reasoning_path": [
+      "Galatasaray S.K.",
+      "inception",
+      "1905"
+    ],
+    "gold_answer": "1905",
+    "difficulty": "single-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "TR_083",
+    "question_text": "Boğaziçi Üniversitesi hangi şehirdedir?",
+    "reasoning_path": [
+      "Boğaziçi Üniversitesi",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "single-hop",
+    "domain": "academia"
+  },
+  {
+    "question_id": "TR_084",
+    "question_text": "Türkiye'nin resmi dili nedir?",
+    "reasoning_path": [
+      "Türkiye",
+      "official language",
+      "Türkçe"
+    ],
+    "gold_answer": "Türkçe",
+    "difficulty": "single-hop",
+    "domain": "geography"
+  },
+  {
+    "question_id": "TR_085",
+    "question_text": "Aziz Sancar hangi alanda Nobel ödülü almıştır?",
+    "reasoning_path": [
+      "Aziz Sancar",
+      "field of work",
+      "Kimya"
+    ],
+    "gold_answer": "Kimya",
+    "difficulty": "single-hop",
+    "domain": "science"
+  },
+  {
+    "question_id": "TR_086",
+    "question_text": "Orhan Pamuk Nobel ödülünü hangi yıl aldı?",
+    "reasoning_path": [
+      "Orhan Pamuk",
+      "award received",
+      "Nobel Edebiyat Ödülü",
+      "year",
+      "2006"
+    ],
+    "gold_answer": "2006",
+    "difficulty": "2-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "TR_087",
+    "question_text": "Aziz Sancar Nobel Kimya Ödülü'nü hangi yıl kazandı?",
+    "reasoning_path": [
+      "Aziz Sancar",
+      "award received",
+      "Nobel Kimya Ödülü",
+      "year",
+      "2015"
+    ],
+    "gold_answer": "2015",
+    "difficulty": "2-hop",
+    "domain": "science"
+  },
+  {
+    "question_id": "TR_088",
+    "question_text": "Cahit Arf hangi alanda çalışmıştır?",
+    "reasoning_path": [
+      "Cahit Arf",
+      "field of work",
+      "Matematik"
+    ],
+    "gold_answer": "Matematik",
+    "difficulty": "single-hop",
+    "domain": "science"
+  },
+  {
+    "question_id": "TR_089",
+    "question_text": "Feza Gürsey hangi şehirde doğmuştur?",
+    "reasoning_path": [
+      "Feza Gürsey",
+      "place of birth",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "single-hop",
+    "domain": "science"
+  },
+  {
+    "question_id": "TR_090",
+    "question_text": "Baklava'nın kökeni hangi mutfağa aittir?",
+    "reasoning_path": [
+      "Baklava",
+      "country of origin",
+      "Türkiye"
+    ],
+    "gold_answer": "Türkiye",
+    "difficulty": "single-hop",
+    "domain": "cuisine"
+  },
+  {
+    "question_id": "TR_091",
+    "question_text": "Türk kahvesi hangi UNESCO listesine girmiştir?",
+    "reasoning_path": [
+      "Türk kahvesi",
+      "heritage status",
+      "UNESCO Somut Olmayan Kültürel Miras"
+    ],
+    "gold_answer": "UNESCO Somut Olmayan Kültürel Miras",
+    "difficulty": "2-hop",
+    "domain": "cuisine"
+  },
+  {
+    "question_id": "TR_093",
+    "question_text": "Adana kebabı hangi şehrin adını taşır?",
+    "reasoning_path": [
+      "Adana kebabı",
+      "named after",
+      "Adana"
+    ],
+    "gold_answer": "Adana",
+    "difficulty": "single-hop",
+    "domain": "cuisine"
+  },
+  {
+    "question_id": "TR_094",
+    "question_text": "Haluk Bilginer hangi şehirde doğmuştur?",
+    "reasoning_path": [
+      "Haluk Bilginer",
+      "place of birth",
+      "İzmir"
+    ],
+    "gold_answer": "İzmir",
+    "difficulty": "single-hop",
+    "domain": "theater"
+  },
+  {
+    "question_id": "TR_095",
+    "question_text": "Devlet Tiyatroları'nın kurulduğu şehir neresidir?",
+    "reasoning_path": [
+      "Devlet Tiyatroları",
+      "headquarters location",
+      "Ankara"
+    ],
+    "gold_answer": "Ankara",
+    "difficulty": "single-hop",
+    "domain": "theater"
+  },
+  {
+    "question_id": "TR_096",
+    "question_text": "Genco Erkal hangi tiyatroyu kurmuştur?",
+    "reasoning_path": [
+      "Genco Erkal",
+      "founded",
+      "Dostlar Tiyatrosu"
+    ],
+    "gold_answer": "Dostlar Tiyatrosu",
+    "difficulty": "single-hop",
+    "domain": "theater"
+  },
+  {
+    "question_id": "TR_097",
+    "question_text": "Çanakkale Savaşı hangi yılda başlamıştır?",
+    "reasoning_path": [
+      "Çanakkale Savaşı",
+      "start time",
+      "1915"
+    ],
+    "gold_answer": "1915",
+    "difficulty": "single-hop",
+    "domain": "military"
+  },
+  {
+    "question_id": "TR_098",
+    "question_text": "Türk Kurtuluş Savaşı'nın başkomutanı kimdir?",
+    "reasoning_path": [
+      "Türk Kurtuluş Savaşı",
+      "commander",
+      "Mustafa Kemal Atatürk"
+    ],
+    "gold_answer": "Mustafa Kemal Atatürk",
+    "difficulty": "single-hop",
+    "domain": "military"
+  },
+  {
+    "question_id": "TR_099",
+    "question_text": "Çanakkale Savaşı hangi cephede yapılmıştır?",
+    "reasoning_path": [
+      "Çanakkale Savaşı",
+      "part of",
+      "I. Dünya Savaşı"
+    ],
+    "gold_answer": "I. Dünya Savaşı",
+    "difficulty": "2-hop",
+    "domain": "military"
+  },
+  {
+    "question_id": "TR_100",
+    "question_text": "Hürriyet gazetesi hangi şehirde kurulmuştur?",
+    "reasoning_path": [
+      "Hürriyet",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "single-hop",
+    "domain": "journalism"
+  },
+  {
+    "question_id": "TR_101",
+    "question_text": "Cumhuriyet gazetesinin kurucusu kimdir?",
+    "reasoning_path": [
+      "Cumhuriyet",
+      "founded by",
+      "Yunus Nadi"
+    ],
+    "gold_answer": "Yunus Nadi",
+    "difficulty": "single-hop",
+    "domain": "journalism"
+  },
+  {
+    "question_id": "TR_102",
+    "question_text": "Anadolu Ajansı hangi yıl kurulmuştur?",
+    "reasoning_path": [
+      "Anadolu Ajansı",
+      "inception",
+      "1920"
+    ],
+    "gold_answer": "1920",
+    "difficulty": "single-hop",
+    "domain": "journalism"
+  },
+  {
+    "question_id": "TR_103",
+    "question_text": "Vakko hangi sektörde faaliyet göstermektedir?",
+    "reasoning_path": [
+      "Vakko",
+      "industry",
+      "Tekstil"
+    ],
+    "gold_answer": "Tekstil",
+    "difficulty": "single-hop",
+    "domain": "fashion"
+  },
+  {
+    "question_id": "TR_104",
+    "question_text": "Mavi Jeans'in kurucusu kimdir?",
+    "reasoning_path": [
+      "Mavi",
+      "founded by",
+      "Sait Akarlılar"
+    ],
+    "gold_answer": "Sait Akarlılar",
+    "difficulty": "single-hop",
+    "domain": "fashion"
+  },
+  {
+    "question_id": "TR_105",
+    "question_text": "Hatice Gönnet hangi alanda çalışmıştır?",
+    "reasoning_path": [
+      "Hatice Gönnet",
+      "field of work",
+      "Hititoloji"
+    ],
+    "gold_answer": "Hititoloji",
+    "difficulty": "single-hop",
+    "domain": "science"
+  },
+  {
+    "question_id": "TR_106",
+    "question_text": "Ankara mı yoksa İzmir mi nüfus olarak daha büyüktür?",
+    "reasoning_path": [
+      "Ankara",
+      "population",
+      "5747325",
+      "İzmir",
+      "population",
+      "4462056"
+    ],
+    "gold_answer": "Ankara",
+    "difficulty": "comparison",
+    "domain": "geography"
+  },
+  {
+    "question_id": "TR_107",
+    "question_text": "Aziz Sancar mı yoksa Orhan Pamuk mu daha önce Nobel kazandı?",
+    "reasoning_path": [
+      "Orhan Pamuk",
+      "award received",
+      "2006",
+      "Aziz Sancar",
+      "award received",
+      "2015"
+    ],
+    "gold_answer": "Orhan Pamuk",
+    "difficulty": "comparison",
+    "domain": "science"
+  },
+  {
+    "question_id": "TR_108",
+    "question_text": "Hürriyet mi yoksa Cumhuriyet mi daha önce kurulmuştur?",
+    "reasoning_path": [
+      "Cumhuriyet",
+      "inception",
+      "1924",
+      "Hürriyet",
+      "inception",
+      "1948"
+    ],
+    "gold_answer": "Cumhuriyet",
+    "difficulty": "comparison",
+    "domain": "journalism"
+  },
+  {
+    "question_id": "USR_001",
+    "question_text": "Türkiye'nin başkentinde hangi araç plakası kullanılmaktadır?",
+    "reasoning_path": [],
+    "gold_answer": "06",
+    "difficulty": "2-hop",
+    "domain": "user-created"
+  },
+  {
+    "question_id": "USR_002",
+    "question_text": "Emre Özkan ve Oktay Derelioğlu'nun ikiside Türkiye U-21'de oynamışlar mıdır?",
+    "reasoning_path": [],
+    "gold_answer": "Evet",
+    "difficulty": "2-hop",
+    "domain": "user-created"
+  },
+  {
+    "question_id": "USR_003",
+    "question_text": "G.O.R.A filmi ve A.R.O.G filminin başrolü olan oyuncunun doğum tarihi nedir?",
+    "reasoning_path": [],
+    "gold_answer": "23 Nisan 1973",
+    "difficulty": "2-hop",
+    "domain": "user-created"
+  },
+  {
+    "question_id": "USR_004",
+    "question_text": "Yalan Dünya ve Avrupa Yakası'nın senaristinin doğduğu şehrin plakası nedir?",
+    "reasoning_path": [],
+    "gold_answer": "34",
+    "difficulty": "2-hop",
+    "domain": "user-created"
+  },
+  {
+    "question_id": "USR_005",
+    "question_text": "Muhteşem Yüzyıl dizisinin erkek başrolünün eşi kimdir?",
+    "reasoning_path": [],
+    "gold_answer": "Bergüzar Korel",
+    "difficulty": "2-hop",
+    "domain": "user-created"
+  },
+  {
+    "question_id": "USR_006",
+    "question_text": "Hakan Şükür'ün doğduğu şehrin bulunduğu il neresidir?",
+    "reasoning_path": [
+      "Hakan Şükür",
+      "place of birth",
+      "Adapazarı",
+      "located in the administrative territorial entity",
+      "Sakarya"
+    ],
+    "gold_answer": "Sakarya",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_007",
+    "question_text": "Mustafa Kemal Atatürk'ün öldüğü şehirde bulunan saray hangisidir?",
+    "reasoning_path": [
+      "Mustafa Kemal Atatürk",
+      "place of death",
+      "Dolmabahçe Sarayı",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "Dolmabahçe Sarayı",
+    "difficulty": "2-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_008",
+    "question_text": "Galatasaray'ın stadyumunun bulunduğu ilçe nerededir?",
+    "reasoning_path": [
+      "Galatasaray S.K.",
+      "home venue",
+      "Rams Park",
+      "located in",
+      "Sarıyer"
+    ],
+    "gold_answer": "Sarıyer",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_009",
+    "question_text": "Fenerbahçe'nin stadyumunun adı nedir?",
+    "reasoning_path": [
+      "Fenerbahçe S.K.",
+      "home venue",
+      "Şükrü Saracoğlu Stadyumu"
+    ],
+    "gold_answer": "Şükrü Saracoğlu Stadyumu",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_010",
+    "question_text": "Beşiktaş'ın stadyumunun bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Beşiktaş J.K.",
+      "home venue",
+      "Vodafone Park",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "2-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_011",
+    "question_text": "Süleyman Demirel'in doğduğu ilin adı nedir?",
+    "reasoning_path": [
+      "Süleyman Demirel",
+      "place of birth",
+      "Atabey",
+      "located in the administrative territorial entity",
+      "Isparta"
+    ],
+    "gold_answer": "Isparta",
+    "difficulty": "2-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_012",
+    "question_text": "Turgut Özal'ın doğduğu şehir neresidir?",
+    "reasoning_path": [
+      "Turgut Özal",
+      "place of birth",
+      "Malatya"
+    ],
+    "gold_answer": "Malatya",
+    "difficulty": "2-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_013",
+    "question_text": "Aziz Sancar'ın doğduğu il neresidir?",
+    "reasoning_path": [
+      "Aziz Sancar",
+      "place of birth",
+      "Savur",
+      "located in the administrative territorial entity",
+      "Mardin"
+    ],
+    "gold_answer": "Mardin",
+    "difficulty": "2-hop",
+    "domain": "science"
+  },
+  {
+    "question_id": "USR_014",
+    "question_text": "Yaşar Kemal'in doğduğu ilçenin bulunduğu il neresidir?",
+    "reasoning_path": [
+      "Yaşar Kemal",
+      "place of birth",
+      "Hemite",
+      "located in the administrative territorial entity",
+      "Osmaniye"
+    ],
+    "gold_answer": "Osmaniye",
+    "difficulty": "2-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "USR_015",
+    "question_text": "Yılmaz Güney'in öldüğü şehir neresidir?",
+    "reasoning_path": [
+      "Yılmaz Güney",
+      "place of death",
+      "Paris"
+    ],
+    "gold_answer": "Paris",
+    "difficulty": "2-hop",
+    "domain": "cinema"
+  },
+  {
+    "question_id": "USR_016",
+    "question_text": "Pamukkale'nin bulunduğu il neresidir?",
+    "reasoning_path": [
+      "Pamukkale",
+      "located in the administrative territorial entity",
+      "Denizli"
+    ],
+    "gold_answer": "Denizli",
+    "difficulty": "2-hop",
+    "domain": "heritage"
+  },
+  {
+    "question_id": "USR_017",
+    "question_text": "Efes Antik Kenti'nin bulunduğu il neresidir?",
+    "reasoning_path": [
+      "Efes",
+      "located in the administrative territorial entity",
+      "Selçuk",
+      "located in the administrative territorial entity",
+      "İzmir"
+    ],
+    "gold_answer": "İzmir",
+    "difficulty": "2-hop",
+    "domain": "heritage"
+  },
+  {
+    "question_id": "USR_018",
+    "question_text": "Mimar Sinan'ın baş yapıtı sayılan Selimiye Camii'nin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Selimiye Camii",
+      "architect",
+      "Mimar Sinan",
+      "Selimiye Camii",
+      "located in",
+      "Edirne"
+    ],
+    "gold_answer": "Edirne",
+    "difficulty": "2-hop",
+    "domain": "architecture"
+  },
+  {
+    "question_id": "USR_019",
+    "question_text": "Sabancı Holding'in kurucusu kimdir?",
+    "reasoning_path": [
+      "Sabancı Holding",
+      "founded by",
+      "Hacı Ömer Sabancı"
+    ],
+    "gold_answer": "Hacı Ömer Sabancı",
+    "difficulty": "2-hop",
+    "domain": "company"
+  },
+  {
+    "question_id": "USR_020",
+    "question_text": "Türkiye Cumhuriyeti'nin kurucusu kimdir?",
+    "reasoning_path": [
+      "Türkiye",
+      "founded by",
+      "Mustafa Kemal Atatürk"
+    ],
+    "gold_answer": "Mustafa Kemal Atatürk",
+    "difficulty": "2-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_021",
+    "question_text": "Galatasaray'ın menajerinin doğduğu şehrin bulunduğu il neresidir?",
+    "reasoning_path": [
+      "Galatasaray S.K.",
+      "head coach",
+      "Okan Buruk",
+      "place of birth",
+      "İstanbul",
+      "located in the administrative territorial entity",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "3-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_022",
+    "question_text": "Fenerbahçe'nin stadyumunun bulunduğu şehrin nüfusu en kalabalık ilçesi neresidir?",
+    "reasoning_path": [
+      "Fenerbahçe S.K.",
+      "home venue",
+      "Şükrü Saracoğlu Stadyumu",
+      "located in",
+      "Kadıköy",
+      "located in the administrative territorial entity",
+      "İstanbul"
+    ],
+    "gold_answer": "Kadıköy",
+    "difficulty": "3-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_023",
+    "question_text": "Aziz Sancar'ın eğitim aldığı üniversitenin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Aziz Sancar",
+      "educated at",
+      "İstanbul Üniversitesi",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "3-hop",
+    "domain": "science"
+  },
+  {
+    "question_id": "USR_024",
+    "question_text": "Süleyman Demirel'in eğitim aldığı üniversitenin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Süleyman Demirel",
+      "educated at",
+      "İstanbul Teknik Üniversitesi",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "3-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_025",
+    "question_text": "Orhan Pamuk'un eğitim gördüğü üniversitenin bulunduğu şehir neresidir?",
+    "reasoning_path": [
+      "Orhan Pamuk",
+      "educated at",
+      "Boğaziçi Üniversitesi",
+      "headquarters location",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "3-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "USR_026",
+    "question_text": "Hakan Şükür'ün uzun yıllar oynadığı kulübün stadyumu hangi şehirdedir?",
+    "reasoning_path": [
+      "Hakan Şükür",
+      "member of sports team",
+      "Galatasaray S.K.",
+      "home venue",
+      "Rams Park",
+      "located in",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "3-hop",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_027",
+    "question_text": "Recep Tayyip Erdoğan'ın doğduğu il hangi coğrafi bölgededir?",
+    "reasoning_path": [
+      "Recep Tayyip Erdoğan",
+      "place of birth",
+      "Rize",
+      "located in",
+      "Karadeniz Bölgesi"
+    ],
+    "gold_answer": "Karadeniz Bölgesi",
+    "difficulty": "3-hop",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_028",
+    "question_text": "Türk Hava Yolları'nın merkezinin bulunduğu havalimanı hangisidir?",
+    "reasoning_path": [
+      "Türk Hava Yolları",
+      "headquarters location",
+      "İstanbul",
+      "Türk Hava Yolları",
+      "hub airport",
+      "İstanbul Havalimanı"
+    ],
+    "gold_answer": "İstanbul Havalimanı",
+    "difficulty": "3-hop",
+    "domain": "transportation"
+  },
+  {
+    "question_id": "USR_029",
+    "question_text": "Nuri Bilge Ceylan'ın yönettiği Kış Uykusu filminin başrolü olan oyuncunun adı nedir?",
+    "reasoning_path": [
+      "Kış Uykusu",
+      "director",
+      "Nuri Bilge Ceylan",
+      "Kış Uykusu",
+      "cast member",
+      "Haluk Bilginer"
+    ],
+    "gold_answer": "Haluk Bilginer",
+    "difficulty": "3-hop",
+    "domain": "cinema"
+  },
+  {
+    "question_id": "USR_030",
+    "question_text": "Türkiye'nin ilk Nobel ödüllü yazarının doğduğu şehir neresidir?",
+    "reasoning_path": [
+      "Orhan Pamuk",
+      "award received",
+      "Nobel Prize in Literature",
+      "Orhan Pamuk",
+      "place of birth",
+      "İstanbul"
+    ],
+    "gold_answer": "İstanbul",
+    "difficulty": "3-hop",
+    "domain": "literature"
+  },
+  {
+    "question_id": "USR_031",
+    "question_text": "Mustafa Kemal Atatürk mü yoksa İsmet İnönü mü daha erken doğmuştur?",
+    "reasoning_path": [
+      "Mustafa Kemal Atatürk",
+      "date of birth",
+      "1881",
+      "İsmet İnönü",
+      "date of birth",
+      "1884"
+    ],
+    "gold_answer": "Mustafa Kemal Atatürk",
+    "difficulty": "comparison",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_032",
+    "question_text": "Süleyman Demirel mi yoksa Turgut Özal mı daha erken doğmuştur?",
+    "reasoning_path": [
+      "Süleyman Demirel",
+      "date of birth",
+      "1924",
+      "Turgut Özal",
+      "date of birth",
+      "1927"
+    ],
+    "gold_answer": "Süleyman Demirel",
+    "difficulty": "comparison",
+    "domain": "politics"
+  },
+  {
+    "question_id": "USR_033",
+    "question_text": "Galatasaray mı yoksa Beşiktaş mı daha erken kurulmuştur?",
+    "reasoning_path": [
+      "Beşiktaş J.K.",
+      "inception",
+      "1903",
+      "Galatasaray S.K.",
+      "inception",
+      "1905"
+    ],
+    "gold_answer": "Beşiktaş",
+    "difficulty": "comparison",
+    "domain": "football"
+  },
+  {
+    "question_id": "USR_034",
+    "question_text": "Boğaziçi Üniversitesi mi yoksa ODTÜ mü daha erken kurulmuştur?",
+    "reasoning_path": [
+      "Boğaziçi Üniversitesi",
+      "inception",
+      "1863",
+      "ODTÜ",
+      "inception",
+      "1956"
+    ],
+    "gold_answer": "Boğaziçi Üniversitesi",
+    "difficulty": "comparison",
+    "domain": "academia"
+  },
+  {
+    "question_id": "USR_035",
+    "question_text": "Topkapı Sarayı mı yoksa Dolmabahçe Sarayı mı daha eski bir yapıdır?",
+    "reasoning_path": [
+      "Topkapı Sarayı",
+      "inception",
+      "1465",
+      "Dolmabahçe Sarayı",
+      "inception",
+      "1856"
+    ],
+    "gold_answer": "Topkapı Sarayı",
+    "difficulty": "comparison",
+    "domain": "heritage"
+  }
 ]

@@ -52,10 +52,9 @@ class NoRetrievalRAG(RAGPipeline):
             raw = self.llm.generate(
                 prompt=(
                     f"Soru: {q_text}\n\n"
-                    "Sadece kendi bilginle yanıtla. Cevabı bilmiyorsan "
-                    "'Bilgi bulunmamaktadır' yaz. Yanıt:"
+                    "Cevap:"
                 ),
-                system=templates.ANSWER_SYSTEM,
+                system=templates.NO_RETRIEVAL_SYSTEM,
                 temperature=0.0,
                 max_tokens=80,
             )

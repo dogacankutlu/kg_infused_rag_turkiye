@@ -83,9 +83,8 @@ class PassageRetriever:
     def dual_retrieve(
         self, original_query: str, expanded_query: str, k_p: int = 6
     ) -> tuple[list[RetrievedPassage], list[RetrievedPassage], list[RetrievedPassage]]:
-        half = max(1, k_p // 2)
-        original_hits = self.search(original_query, half, "original")
-        expanded_hits = self.search(expanded_query, half, "expanded")
+        original_hits = self.search(original_query, k_p, "original")
+        expanded_hits = self.search(expanded_query, k_p, "expanded")
         seen: set[str] = set()
         deduped: list[RetrievedPassage] = []
         for p in original_hits + expanded_hits:
@@ -93,4 +92,4 @@ class PassageRetriever:
                 continue
             seen.add(p.entity_id)
             deduped.append(p)
-        return original_hits, expanded_hits, deduped
+        return original_hits, expanded_hits, deduped[:k_p]

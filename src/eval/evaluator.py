@@ -33,12 +33,19 @@ class Evaluator:
 
     def _previously_seen_qids(self) -> set[str]:
         """Question IDs already logged for this pipeline — for idempotency,
-        these will be re-run and re-logged but excluded from metric aggregates."""
+        these will be re-run and re-logged but excluded from metric aggregates.
+
+        Errored records (exception during pipeline execution) are NOT counted
+        as "seen" — they don't represent real model behaviour, so the next
+        successful run for the same qid should contribute to aggregates.
+        """
         pipeline_name = getattr(self.pipeline, "name", "")
         seen: set[str] = set()
         for rec in self.run_logger.iter_attempts():
             if rec.get("pipeline") != pipeline_name:
                 continue
+            if rec.get("error"):
+                continue  # crashed runs don't claim the qid
             qid = (rec.get("question") or {}).get("question_id", "")
             if qid:
                 seen.add(qid)
